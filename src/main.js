@@ -155,7 +155,7 @@ router.beforeEach(async (to, from, next) => {
   } else if (!teacherLogin && !studentLogin && to.name != "register") {
     // Take user to login page if not signed in
     store.dispatch("showMessage", {
-      message: "Unauthorized to view page!",
+      message: "Login to continue!",
       success: false,
     });
     next({ name: "login" });

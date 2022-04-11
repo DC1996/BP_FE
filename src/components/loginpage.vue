@@ -32,7 +32,9 @@
                         
                         <!-- Buttons -->
                         <v-btn @click="loginUser()" :loading="loading" block class="px-6 py-2" color="primary"> Login </v-btn>
-                        <v-btn to="/register" :ripple="false" text plain class="mt-4 mb-0 px-3 py-1 no-uppercase text-caption"> 
+                        <v-btn 
+                            to="/register" :ripple="false" text plain style="text-decoration: underline"
+                            class="mt-4 mb-0 px-3 py-1 no-uppercase text-caption"> 
                             Create an account 
                         </v-btn>
                     </v-container>
