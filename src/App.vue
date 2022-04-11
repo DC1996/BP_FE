@@ -60,9 +60,9 @@ export default {
     border: solid 1px red;
   }
 
-  .custom-font {
+  /*.custom-font {
     font-family: 'Raleway', sans-serif;
-  }
+  }*/
   .t-t-color {
     color: var(--main-text-color) !important;
   }
