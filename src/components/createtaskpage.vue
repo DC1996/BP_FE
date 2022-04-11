@@ -1,5 +1,10 @@
 <template>
-    <v-container id="task" class="d-flex flex-column justify-start align-center mt-2 pb-0 b-g rounded-lg">
+    <v-container id="task" class="d-flex flex-column justify-start align-center mt-2 pb-0 b-g rounded-lg" style="position: relative;">
+
+        <v-btn elevation="1" large color="primary" icon style="position: absolute; left: 0.5rem; background-color: white"
+            class="px-6 py-2 mx-2 no-uppercase" @click="helpDialog = true"> 
+            <v-icon>mdi-help-circle-outline</v-icon>
+        </v-btn>
 
         <!-- Task name -->        
         <h4 class="text-h5 custom-font my-4 font-weight-medium"> {{ this.name }} </h4>
@@ -61,8 +66,7 @@
                     <h3 class="ma-2 pa-1"> {{ preview.text.trim() }} </h3>
                     <div class="d-flex flex-column ma-2 pa-1" v-for="(q, i) in preview.questions" :key="'q' + i">
                         
-                        <h4 id="qLatex" class="ma-1"> {{ replaceAnswers(q.text.trim()) }} </h4>
-                        <math-jax :latex="replaceAnswers(q.text.trim())"></math-jax>
+                        <h4 class="ma-1"> {{ replaceAnswers(q.text.trim()) }} </h4>
 
                         <div class="ma-1 pa-1" v-for="(a, i) in q.answers" :key="'a' + i">
                             <p v-for="(item, index) in a.correct" :key="index"> a) {{item}} </p>
@@ -105,20 +109,10 @@
                     </v-btn>
                 </div>
             </div>
-            <div class="d-flex flex-row mt-2 mb-1 justify-self-end">
-                <v-btn class="mx-1" @click="parseText">Parse</v-btn>
-                <v-btn class="mx-1" @click="previewTask">Preview</v-btn>
-                <v-tooltip right>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn v-bind="attrs" v-on="on" large icon
-                            @click="previewTask"
-                            class="mx-2 my-1 px-2 py-2 pointer elevation-2">
-                            <v-icon small> mdi-plus </v-icon>
-                            </v-btn>
-                        </template>
-                        <span> Preview task </span>
-                    </v-tooltip>
-                <v-btn elevation="2" large color="white"
+            <div class="d-flex flex-row mt-2 mb-1 justify-self-end justify-end">
+                <v-btn large class="px-6 py-2 mx-2 no-uppercase" @click="parseText">Evaluate</v-btn>
+                <v-btn large class="px-6 py-2 mx-2 no-uppercase" @click="previewTask">Preview</v-btn>
+                <v-btn elevation="2" large color="primary"
                 class="px-6 py-2 mx-2 no-uppercase" @click="getCategories(); overlaySave = true"> Save
                 </v-btn>
                 <!-- <v-btn class="mx-1" @click="restoreText">Restore</v-btn> -->
@@ -287,6 +281,33 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="helpDialog" width="450" :retain-focus="false">
+            <v-card class="d-flex flex-column rounded-lg pt-2">
+                <v-card-title> Task creation process </v-card-title>
+
+                <v-card-text>
+                    (You can check out other created tasks in the Your tasks page when you click modify) <br>
+                    1. Define task text <br>
+                        $variable_name will be replaced with a concrete value once defined <br>
+                    2. Click the Evaluate button when you want to define variables or answers <br>
+                    3. Add and define a question text, @answer_name will be replaced by the defined asnwer options <br>
+                    4. Under Variables section, you can set the ranges for each variable <br>
+                    5. Under Answers section, you can set a template for each answer correct and incorrect <br>
+                    6. Hit Preview to see how the task looks like <br>
+                    7. hit Save when you are done, set Task grade and categories <br>
+
+                </v-card-text>
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn dark color="primary" @click="helpDialog = false"> Okay </v-btn>
+                </v-card-actions>
+                
+            </v-card>
+        </v-dialog>
+
     </v-container>
 </template>
 
@@ -328,6 +349,7 @@ import testDataService from '../services/testDataService.js';
                 overlayAddV: false,
                 overlaySave: false,
                 taskOverlay: false,
+                helpDialog: false,
                 indexV: 0,
                 indexAV: 0,
                 indexA: 0,
@@ -597,15 +619,19 @@ import testDataService from '../services/testDataService.js';
                 // QUESTIONS
                 this.ext_text.task.questions.forEach((question) => {
 
-                    console.log('Q',question);
-                    console.log(tokenize("Q: ", question.text));
+                    //console.log('Q',question);
+                    //console.log(tokenize("Q: ", question.text));
 
                     this.ext_text.extractAnswers(tokenize(question.text));
                 });
 
-                let generated_text = this.ext_text.generateText();
-
-                console.log(generated_text);
+                try{
+                    let generated_text = this.ext_text.generateText();
+                    this.$store.dispatch('showMessage', {message: "Successfuly evaluated!"});
+                    //console.log(generated_text);
+                } catch(err) {
+                    this.$store.dispatch('showMessage', {message: err.message, success: false});
+                }
             }     
         }
     }

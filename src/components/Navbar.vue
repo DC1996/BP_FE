@@ -81,13 +81,6 @@
         startTestCreation: 'test/startTestCreation'
       }),
 
-      moveToCreateTest() {
-        localStorage.removeItem("testId");
-        this.startTestCreation().then(() => {
-          this.$router.push({ name: "createTest" });
-        });
-      },
-
       // Log out the user
       logoutUser() {
         this.$store.dispatch('setLoggedIn', { value: false });

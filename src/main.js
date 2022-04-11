@@ -58,6 +58,12 @@ Vue.mixin({
       localStorage.removeItem("taskId");
       this.$router.push({ name: "createTask" });
     },
+    moveToCreateTest() {
+      localStorage.removeItem("testId");
+      store.dispatch("test/startTestCreation").then(() => {
+        this.$router.push({ name: "createTest" });
+      });
+    },
     modifyTask(id) {
       // pass id paramter to the router
       this.$router.push({ name: "createTask", params: { taskId: id } });
@@ -129,18 +135,32 @@ router.beforeEach(async (to, from, next) => {
     to.name != "takeTest" &&
     to.name != "register"
   ) {
-    // else go to login
+    // Return signed in user to homepage
+    store.dispatch("showMessage", {
+      message: "Unauthorized to view page!",
+      success: false,
+    });
     next({ name: "home" });
   } else if (
     // Teacher can go anywhere except take a test and assignemnts
     teacherLogin &&
     (to.name == "yourAssignments" || to.name == "takeTest")
   ) {
-    return next({ name: "home" });
+    // Return signed in user to homepage
+    store.dispatch("showMessage", {
+      message: "Unauthorized to view page!",
+      success: false,
+    });
+    next({ name: "home" });
   } else if (!teacherLogin && !studentLogin && to.name != "register") {
+    // Take user to login page if not signed in
+    store.dispatch("showMessage", {
+      message: "Unauthorized to view page!",
+      success: false,
+    });
     next({ name: "login" });
   } else {
-    // Go further
+    // Go to desired page
     next();
   }
 });
@@ -155,17 +175,7 @@ new Vue({
   components: {
     Navbar,
   },
-  beforeMount() {
-    window.addEventListener("beforeunload", this.closePage);
-  },
-  beforeDestroy() {
-    window.removeEventListener("beforeunload", this.closePage);
-  },
-  methods: {
-    closePage(event) {
-      window.localStorage.clear();
-    },
-  },
+  methods: {},
   vuetify,
   store: store,
   render: (h) => h(App),
