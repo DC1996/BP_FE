@@ -155,7 +155,17 @@ new Vue({
   components: {
     Navbar,
   },
-  methods: {},
+  beforeMount() {
+    window.addEventListener("beforeunload", this.closePage);
+  },
+  beforeDestroy() {
+    window.removeEventListener("beforeunload", this.closePage);
+  },
+  methods: {
+    closePage(event) {
+      window.localStorage.clear();
+    },
+  },
   vuetify,
   store: store,
   render: (h) => h(App),
