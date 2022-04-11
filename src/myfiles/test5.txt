@@ -1,0 +1,1 @@
+#text Štvorec so stranou a = $a v sebe má štyri menšie kocky.\n\n#question Aká je dĺžka strany menšieho štvorca? @a_m\n\n#definitions\n$a\n\n@a_m.correct = [\n$a / 4\n]\n@a_m.incorrect = [\n$a / 3,\n$a / 4 - 1,\n$a / 2\n]\n\n#ranges\n$a = range(4, 40, 1)\n
