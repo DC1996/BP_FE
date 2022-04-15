@@ -46,7 +46,7 @@
                     class="d-flex flex-column py-1">
                       <v-select 
                         dense :items="answer.options" 
-                        :value="test.content[tIndex].content.questions[i].answers[optIndex].selected" :label="Answer" outlined>
+                        :value="test.content[tIndex].content.questions[i].answers[optIndex].selected" label="Answer" outlined>
                       </v-select>
                   </div>
                 </div>
@@ -76,7 +76,7 @@
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'text'"> 
                   <div class="dflex flex-column py-1 mr-4" v-for="(answer, optIndex) in question.answers" :key="optIndex">
                       <v-text-field dense
-                        :label="Asnwer"
+                        label="Asnwer"
                         v-model="test.content[tIndex].content.questions[i].answers[optIndex].selected"
                         outlined
                       ></v-text-field>
