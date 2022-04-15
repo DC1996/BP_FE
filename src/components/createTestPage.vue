@@ -213,7 +213,7 @@
                   <div v-for="(answer, index) in question.answers" :key="index"
                     class="d-flex flex-column py-4">
                       <v-select style="max-width: 200px"
-                        dense :items="answer.correct.concat(answer.incorrect)" 
+                        dense :items="answer.options" 
                         label="Answer" outlined>
                       </v-select>
                   </div>
@@ -224,7 +224,7 @@
                   <div class="d-flex flex-column" v-for="(answer, index) in question.answers" :key="index">
                     <v-radio-group readonly v-model="placeholderModel">
                       <v-radio dense class="py-1"
-                        v-for="(value, i) in answer.correct.concat(answer.incorrect)"
+                        v-for="(value, i) in answer.options"
                         :key="value.toString() + i" :label="value.toString()" :value="i">
                       </v-radio>
                     </v-radio-group>
@@ -236,7 +236,7 @@
                   <div class="d-flex flex-column py-1 px-2" v-for="(answer, index) in question.answers" :key="index">
                     <p> {{ answer.name }} </p>
                       <v-checkbox dense class="pa-0 ma-0" 
-                        v-for="(value, i) in answer.correct.concat(answer.incorrect)"
+                        v-for="(value, i) in answer.options"
                         :key="value.toString()" :label="value.toString()" :value="i">
                       </v-checkbox>
                   </div>
@@ -324,7 +324,7 @@
                     label="Test name" placeholder="Enter test name" @change="setTestName" >
                 </v-text-field>
 
-                <v-containter class="d-flex flex-row my-3">
+                <v-container class="d-flex flex-row my-3">
                   <!-- Selected grade -->
                   <v-text-field 
                       class="px-4" v-model="$store.state.test.grade" outlined readonly hide-details=""
@@ -336,7 +336,7 @@
                       class="px-4" v-model="$store.state.test.timeLimit" outlined readonly hide-details=""
                       label="Time limit">
                   </v-text-field>
-                </v-containter>
+                </v-container>
                 
 
                 <!-- Set categories to task -->

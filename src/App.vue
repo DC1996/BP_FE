@@ -30,8 +30,6 @@ export default {
   beforeCreate() {
     // prevent unwanted popup of snackbar at page reload
     this.$store.dispatch('hideMessage');
-    // set tab title
-    document.title = "BP - Czirok (preview)"
   }
 
 };
@@ -60,9 +58,13 @@ export default {
     border: solid 1px red;
   }
 
-  /* .custom-font {
+  .text-underline {
+    text-decoration: underline;
+  }
+
+  .custom-font {
     font-family: 'Raleway', sans-serif;
-  } */
+  }
   .t-t-color {
     color: var(--main-text-color) !important;
   }

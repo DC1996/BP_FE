@@ -33,7 +33,7 @@
                   <p
                     class="font-weight-black align-self-center ma-0 text-subtitle-1"> 
                     <span class="font-weight-medium text-body-1"> Question #{{ i+1 }}: </span><br>
-                    {{ question.text }}
+                    {{ question.text.replace(/@.+/, '') }}
                   </p>
                 </div>
 
@@ -45,8 +45,8 @@
                   <div v-for="(answer, optIndex) in question.answers" :key="optIndex"
                     class="d-flex flex-column py-1">
                       <v-select 
-                        dense :items="answer.correct.concat(answer.incorrect)" 
-                        :value="test.content[tIndex].content.questions[i].answers[optIndex].selected" :label="answer.name" outlined>
+                        dense :items="answer.options" 
+                        :value="test.content[tIndex].content.questions[i].answers[optIndex].selected" :label="Answer" outlined>
                       </v-select>
                   </div>
                 </div>
@@ -54,10 +54,9 @@
                 <!-- type == 'radio' -->
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'radio'">  
                   <div class="d-flex flex-column py-1 px-2" v-for="(answer, optIndex) in question.answers" :key="optIndex">
-                    <p> {{ answer.name }} </p>
                     <v-radio-group v-model="test.content[tIndex].content.questions[i].answers[optIndex].selected">
                       <v-radio dense class="py-1"
-                        v-for="(value, r_i) in answer.correct.concat(answer.incorrect)" :value="value"
+                        v-for="(value, r_i) in answer.options" :value="value"
                         :key="r_i" :label="value.toString()">
                       </v-radio>
                     </v-radio-group>
@@ -67,8 +66,7 @@
                 <!-- type == 'checkbox' -->
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'checkbox'"> 
                   <div class="d-flex flex-column py-1 px-2" v-for="(answer, optIndex) in question.answers" :key="optIndex">
-                    <p> {{ answer.name }} </p>
-                      <v-checkbox dense class="pa-0 ma-0" v-for="(value) in answer.correct.concat(answer.incorrect)"
+                      <v-checkbox dense class="pa-0 ma-0" v-for="(value) in answer.options"
                         :key="value" :label="value.toString()" v-model="test.content[tIndex].content.questions[i].answers[optIndex].selected">
                       </v-checkbox>
                   </div>
@@ -78,7 +76,7 @@
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'text'"> 
                   <div class="dflex flex-column py-1 mr-4" v-for="(answer, optIndex) in question.answers" :key="optIndex">
                       <v-text-field dense
-                        :label="answer.name"
+                        :label="Asnwer"
                         v-model="test.content[tIndex].content.questions[i].answers[optIndex].selected"
                         outlined
                       ></v-text-field>

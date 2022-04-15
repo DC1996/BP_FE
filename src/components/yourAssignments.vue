@@ -180,9 +180,9 @@ import userDataService from '../services/userDataService';
                 this.$router.push({name: "takeTest", params: {id: id}})
             },
 
-            viewResults(test) {
+            async viewResults(test) {
                 this.selectedTest = test;
-                this.testResult();
+                await this.getResults(test.id);
                 this.resultsDialog = true;
             },
 
@@ -234,6 +234,13 @@ import userDataService from '../services/userDataService';
                         }
                     });
                 });
+            },
+
+            // Get results
+            async getResults(id) {
+                let results = await concreteTestDataService.getResults(id);
+                this.calculatedPercentage = results.data.percentage;
+                this.calculatedFraction = `${results.data.correct}/${results.data.total}`;
             },
         },
     }

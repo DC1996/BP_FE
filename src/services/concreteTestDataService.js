@@ -9,6 +9,10 @@ class ConcreteTestDataService {
     return http.get(`/concreteTests/${id}`);
   }
 
+  getResults(id) {
+    return http.get(`/concreteTests/${id}/results`);
+  }
+
   create(data) {
     return http.post("/concreteTests", data);
   }

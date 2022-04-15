@@ -26,12 +26,12 @@ export class Token
         // Variable
         vSign :      "$",
         variable :   /[a-zA-Z0-9_]/,
-        gVariable :  /\$[a-zA-Z0-9]+/g,
+        gVariable :  /\$[a-zA-Z0-9_]+/g,
         
         // Answer
         aSign :      "@",
         answer :     /[a-zA-Z0-9_]/,
-        gAnswer :    /@[a-zA-Z0-9]+/g,
+        gAnswer :    /@[a-zA-Z0-9_]+/g,
 
         // Keyword
         kSign :      "#",
@@ -125,7 +125,8 @@ export function tokenize(data)
                         break; 
                     }
 
-                    case Token.types.whitespace.space : break;
+                    case Token.types.whitespace.space : 
+                        { tokens.push( new Token(Token.types.whitespace.space, character) ); break }
                     case Token.types.whitespace.tabulator : break;
                     case Token.types.whitespace.newline : 
                         {  tokens.push( new Token(Token.types.whitespace.newline, character)); break; }

@@ -142,7 +142,7 @@ export class Extractor {
 
     // Add incorrect option(s) for each answer
     this.task.answers.forEach((answer) => {
-      // Answer is up-to-date and could ave been set by the user
+      // Answer is up-to-date and could have been set by the user
       if (answer.visible) {
         text = text.concat(answer.name, ".incorrect = [ \n");
         answer.incorrect.forEach((incorrect, i) => {
@@ -150,6 +150,7 @@ export class Extractor {
             text = text.concat(", \n");
           }
 
+          console.log("ADDING WHOLE: ", incorrect);
           text = text.concat(incorrect);
         });
         text = text.concat("\n ] \n");

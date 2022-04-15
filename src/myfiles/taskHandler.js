@@ -182,6 +182,7 @@ export function parseMathLang(text) {
     if (!checkTokenValue("#text")) tokenValueError("Expected #text keyword");
 
     i++; // Move to next token
+    skipSpaces();
 
     // Append text until the next keyword
     while (!checkEndOfInput() && !checkTokenType(Token.types.keyword)) {
@@ -193,6 +194,7 @@ export function parseMathLang(text) {
       task.addTaskText(tokens[i].value);
 
       i++; // Move to next token
+      skipSpaces();
     }
   }
 
@@ -209,6 +211,7 @@ export function parseMathLang(text) {
       task.addNewQuestion();
 
       i++; // Move to next token
+      skipSpaces();
 
       // Add question content
       while (!checkTokenType(Token.types.keyword)) {
@@ -224,6 +227,7 @@ export function parseMathLang(text) {
         task.addQuestionText(tokens[i].value);
 
         i++; // Move to next token
+        skipSpaces();
       }
     } while (
       checkTokenType(Token.types.keyword) &&
@@ -239,6 +243,7 @@ export function parseMathLang(text) {
       tokenValueError("Expected '#definitions' keyword");
 
     i++; // Move to next token
+    skipSpaces();
 
     // Until the next keyword
     while (!checkTokenType(Token.types.keyword)) {
@@ -249,27 +254,31 @@ export function parseMathLang(text) {
           task.variables.find((v) => v.name == tokens[i].value) == undefined
         ) {
           task.addNewVariable(tokens[i].value);
-          task.variables.at(task.variables.length - 1).added = true;
+          task.variables.at(-1).added = true;
         }
 
         // Find index of current variable to process
         task.setVariableIndex(tokens[i].value);
 
         i++; // Move to next token
+        skipSpaces();
 
         // Variable definition
         if (checkTokenType(Token.types.operator.eq)) {
           i++; // Move to next token
+          skipSpaces();
 
           let temp_def = "";
           while (!checkTokenType(Token.types.whitespace.newline)) {
             // Collect variable definition
             temp_def += " " + tokens[i].value;
             i++; // Move to next token
+            skipSpaces();
           }
 
           task.addVariableDefinition(temp_def.trim());
           i++; // Move to next token
+          skipSpaces();
         }
         // Variable declaration
         else if (!checkTokenType(Token.types.whitespace.newline)) {
@@ -286,6 +295,7 @@ export function parseMathLang(text) {
 
         console.log("ANSW", answer.name);
         i++; // Move to next token
+        skipSpaces();
 
         // Look for '.correct' or '.incorrect'
         if (!checkTokenType(Token.types.special.accessor))
@@ -294,24 +304,28 @@ export function parseMathLang(text) {
         // Save answer accessor type
         let answerType = tokens[i].value;
         i++; // Move to next token
+        skipSpaces();
 
         // Look for =
         if (!checkTokenType(Token.types.operator.eq))
           tokenTypeError("Expected an equal sign =");
 
         i++; // Move to next token
+        skipSpaces();
 
         // Look for [
         if (!checkTokenType(Token.types.special.lBracket))
           tokenTypeError("Expected an opening bracket [");
 
         i++; // Move to next token
+        skipSpaces();
 
         // Look for newline
         if (!checkTokenType(Token.types.whitespace.newline))
           tokenTypeError("Expected a newline character '\\n'");
 
         i++; // Move to next token
+        skipSpaces();
 
         // Exclude ]
         if (checkTokenType(Token.types.special.rBracket))
@@ -335,14 +349,15 @@ export function parseMathLang(text) {
           if (checkTokenType(Token.types.special.comma)) i++; // Move to next token
 
           // Save definition based on accessor type
-          if (answerType == ".correct") {
+          if (answerType == ".correct" && answerDefinition != "") {
             answer.correct.push(answerDefinition);
           }
-          if (answerType == ".incorrect") {
+          if (answerType == ".incorrect" && answerDefinition != "") {
             answer.incorrect.push(answerDefinition);
           }
 
           i++; // Move to next token
+          skipSpaces();
         }
       }
 
@@ -352,7 +367,7 @@ export function parseMathLang(text) {
     }
   }
 
-  // Parses the #ranes part of the text
+  // Parses the #ranges part of the text
   function parseRanges() {
     if (!checkTokenType(Token.types.keyword))
       tokenTypeError("Expected keyword, starting with #");
@@ -361,13 +376,14 @@ export function parseMathLang(text) {
 
     i++; // Move to next token
     skipNewLines();
+    skipSpaces();
 
     while (i < tokens.length) {
       if (
         !checkTokenType(Token.types.variable) &&
         !checkTokenType(Token.types.answer)
       )
-        tokenTypeError("Exptected variable or answer");
+        tokenTypeError("Expetected variable or answer");
 
       // Load variable (or answer)
       let variable;
@@ -380,10 +396,12 @@ export function parseMathLang(text) {
         semanticError("Variable " + tokens[i].value + " is undefined.");
 
       i++; // Move to next token
+      skipSpaces();
 
       if (!checkTokenType(Token.types.operator.eq))
         tokenTypeError("Expected opeator =");
       i++; // Move to next token
+      skipSpaces();
 
       if (!checkTokenType(Token.types.text)) {
         tokenTypeError("Expected text type");
@@ -392,42 +410,50 @@ export function parseMathLang(text) {
         tokenValueError("Expected 'range' text");
       }
       i++; // Move to next token
+      skipSpaces();
 
       // (
       if (!checkTokenType(Token.types.special.lParenth))
         tokenTypeError("Expected left parenthesis (");
       i++; // Move to next token
+      skipSpaces();
 
       // start
       if (!checkTokenType(Token.types.number))
         tokenTypeError("Expected a number");
       variable.range.start = tokens[i].value;
       i++; // Move to next token
+      skipSpaces();
 
       if (!checkTokenType(Token.types.special.comma))
         tokenTypeError("Expected comma separator ,");
       i++; // Move to next token
+      skipSpaces();
 
       // end
       if (!checkTokenType(Token.types.number))
         tokenTypeError("Expected a number");
       variable.range.end = tokens[i].value;
       i++; // Move to next token
+      skipSpaces();
 
       if (!checkTokenType(Token.types.special.comma))
         tokenTypeError("Expected comma separator ,");
       i++; // Move to next token
+      skipSpaces();
 
       // step
       if (!checkTokenType(Token.types.number))
         tokenTypeError("Expected a number");
       variable.range.step = tokens[i].value;
       i++; // Move to next token
+      skipSpaces();
 
       // )
       if (!checkTokenType(Token.types.special.rParenth))
         tokenTypeError("Expected closing right parenthesis )");
       i++; // Move to next token
+      skipSpaces();
 
       skipNewLines();
     }
@@ -436,7 +462,16 @@ export function parseMathLang(text) {
   function skipNewLines() {
     while (
       i < tokens.length &&
-      checkTokenType(Token.types.whitespace.newline)
+      ( checkTokenType(Token.types.whitespace.newline) || checkTokenType(Token.types.whitespace.space) )
+    ) {
+      i++;
+    }
+  }
+
+  function skipSpaces() {
+    while (
+      i < tokens.length &&
+      checkTokenType(Token.types.whitespace.space)
     ) {
       i++;
     }

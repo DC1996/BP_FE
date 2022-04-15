@@ -170,16 +170,6 @@ import userDataService from '../services/userDataService';
                 startTestModification: 'test/startTestModification'
             }),
 
-            // Transform timestamp to readable format
-            getHumanReadableTimestamp(timestamp) {
-                let [date, time] = timestamp.split("T");
-
-                let [year, month, day] = date.split("-");
-                let [hours, minutes] = time.split(":", 2);
-
-                return `${day[0] == '0' ? day[1] : day}.${month[0] == '0' ? month[1] : month}.${year} ${hours}:${minutes}`
-            },
-
             // Hand out test to students
             async handoutTest() {
 
@@ -199,6 +189,16 @@ import userDataService from '../services/userDataService';
 
                     // Generate ConcreteTasks from AbstractTasks
                     let generated = await generatorService.generateMultiple({ abstractTasks });
+                    console.log('HERE IS THE CONCRETE TASKS', generated.data.concreteTasks);
+
+                    // Save expected answers
+                    let expectedAnswers = [];
+                    for(let concreteTask of generated.data.concreteTasks) {
+                        console.log(concreteTask.content.expectedAnswers);
+                        expectedAnswers = expectedAnswers.concat([...concreteTask.content.expectedAnswers]);
+                        delete concreteTask.content.expectedAnswers
+                    }
+                    
 
                     // Create a new ConcreteTest
                     concreteTestDataService.create({
@@ -206,6 +206,7 @@ import userDataService from '../services/userDataService';
                         timeLimit: abstractTest.data.timeLimit,
                         // tasks {content, renderOption}
                         content: generated.data.concreteTasks,
+                        expectedAnswers: expectedAnswers,
                         createdFrom: this.selectedTestID,
                         assignedTo: student,
                         assignedBy: this.$store.state.app.userID 

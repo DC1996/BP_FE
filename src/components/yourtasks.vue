@@ -27,7 +27,7 @@
              <template v-slot:item="row">
                 <tr>
                     <td>{{ row.item.name }}</td>
-                    <td>{{ row.item.last_mod }}</td>
+                    <td>{{ getHumanReadableTimestamp(row.item.last_mod) }}</td>
 
                     <td>
                     <v-btn plain class="pa-1" :ripple="false" @click="modifyTask(row.item.id)">
@@ -126,13 +126,12 @@
             deleteTask(id) {
                 TaskDataService.delete(id)
                 .then((res) => {
-                    this.message = res.data.message;
-                    this.success = true;
-                    this.infoMessage = true;
+                    this.$store.dispatch('showMessage', {message: res.data.message });
                     this.retrieveTasks();
                     this.deleteDialog = false;
                 })
                 .catch((err) => {
+                    this.$store.dispatch('showMessage', {message: err.resposne.data.message });
                     this.message = err.response.data.message;
                     this.success = false;
                     this.infoMessage = true;

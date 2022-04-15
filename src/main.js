@@ -32,6 +32,10 @@ initMathJax({}, () => {
 });
 Vue.use(MathJax);
 
+// MathJax
+import VueMathjax from "vue-mathjax";
+Vue.use(VueMathjax);
+
 // Allow access to components
 Vue.use(store);
 Vue.use(Vuetify);
@@ -67,6 +71,16 @@ Vue.mixin({
     modifyTask(id) {
       // pass id paramter to the router
       this.$router.push({ name: "createTask", params: { taskId: id } });
+    },
+    // Transform timestamp to readable format
+    getHumanReadableTimestamp(timestamp) {
+      let [date, time] = timestamp.split(", ");
+
+      let [month, day, year] = date.split("/");
+      let [hours, minutes, timeOfDay] = time.split(":");
+      let [seconds, amPm] = timeOfDay.split(" ");
+
+      return `${day}.${month}.${year} ${amPm == 'AM' ? hours : parseInt(hours)+12}:${minutes}:${seconds}`;
     },
   },
 });
@@ -155,7 +169,7 @@ router.beforeEach(async (to, from, next) => {
   } else if (!teacherLogin && !studentLogin && to.name != "register") {
     // Take user to login page if not signed in
     store.dispatch("showMessage", {
-      message: "Login to continue!",
+      message: "Login to continue to this page!",
       success: false,
     });
     next({ name: "login" });
