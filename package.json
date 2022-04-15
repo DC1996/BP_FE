@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mathjax-vue": "^0.0.2",
+    "mathjs": "^10.4.3",
     "mysql2": "^2.3.3",
     "sequelize": "^6.18.0",
     "vue": "^2.6.14",
