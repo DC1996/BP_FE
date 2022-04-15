@@ -160,6 +160,8 @@
               let shouldFinishBefore = new Date(concreteTest.data.shouldFinishBefore);
               let now = new Date();
 
+              console.log("SHOULD FINISH: ", shouldFinishBefore, "NOW: ", now);
+
               // Check if timer should ran out
               if( now >= shouldFinishBefore ) {
                   // Update test status to finished and ending timestamp
