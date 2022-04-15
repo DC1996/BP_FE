@@ -74,7 +74,7 @@ Vue.mixin({
     },
     // Transform timestamp to readable format
     getHumanReadableTimestamp(timestamp) {
-      let [date, time] = timestamp.split("T");
+      let [date, time] = timestamp.split(" ");
       
       let [year, month, day] = date.split("-");
       let [hours, minutes] = time.split(":", 2);
