@@ -74,13 +74,12 @@ Vue.mixin({
     },
     // Transform timestamp to readable format
     getHumanReadableTimestamp(timestamp) {
-      let [date, time] = timestamp.split(", ");
+      let [date, time] = timestamp.split("T");
+      
+      let [year, month, day] = date.split("-");
+      let [hours, minutes] = time.split(":", 2);
 
-      let [month, day, year] = date.split("/");
-      let [hours, minutes, timeOfDay] = time.split(":");
-      let [seconds, amPm] = timeOfDay.split(" ");
-
-      return `${day}.${month}.${year} ${amPm == 'AM' ? hours : parseInt(hours)+12}:${minutes}:${seconds}`;
+      return `${day[0] == '0' ? day[1] : day}.${month[0] == '0' ? month[1] : month}.${year} ${hours}:${minutes}`
     },
   },
 });
