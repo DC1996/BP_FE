@@ -62,9 +62,10 @@ export default {
     text-decoration: underline;
   }
 
-  .custom-font {
+  /*.custom-font {
     font-family: 'Raleway', sans-serif;
-  }
+  }*/
+  
   .t-t-color {
     color: var(--main-text-color) !important;
   }
