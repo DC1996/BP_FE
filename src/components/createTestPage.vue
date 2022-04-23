@@ -44,12 +44,12 @@
             <v-row class="d-flex justify-end pa-2 px-6 mt-2">
               <v-btn 
                 @click="populateDatabase()"
-                class="my-2 mx-2 align-self-end" text> 
+                class="my-2 mx-2 align-self-end no-uppercase" text> 
                 Cancel 
               </v-btn>
               <v-btn 
                 :disabled="$store.state.test.grade == '0'" 
-                class="my-2 align-self-end" color="primary"
+                class="my-2 align-self-end no-uppercase" color="primary"
                 @click="moveToNextStep()"> 
                 Continue 
               </v-btn>
@@ -75,12 +75,12 @@
 
           <!-- Action buttons-->
           <v-row class="d-flex justify-end pa-2 px-6 mt-2">
-            <v-btn outlined text class="my-2 mx-2 align-self-end" @click="moveToPrevStep()"> 
+            <v-btn outlined text class="my-2 mx-2 align-self-end no-uppercase" @click="moveToPrevStep()"> 
               Back 
             </v-btn>
             <v-btn 
               :disabled="$store.state.test.selectedTaskCategories.length == 0"
-              class="my-2 align-self-end" color="primary"
+              class="my-2 align-self-end no-uppercase" color="primary"
               @click="getTasks(); moveToNextStep();">
               Continue 
             </v-btn>
@@ -93,7 +93,10 @@
       <v-stepper-content step="3">
 
         <!-- Tasks -->
-        <v-container class="d-flex flex-column"> 
+        <p class="mx-7" v-if="$store.state.test.tasks.length == 0"> 
+          No tasks found for selected grade and categories. 
+        </p>
+        <v-container class="d-flex flex-column" v-if="$store.state.test.tasks.length != 0">
           <v-badge 
             v-for="(task, index) in $store.state.test.tasks" :key="index"
             :value="isTaskSelected(task.id)" color="primary" icon="mdi-check" overlap>
@@ -105,12 +108,12 @@
         </v-container>
 
         <!-- Action buttons -->
-        <v-row class="d-flex justify-end pa-2 px-6 mt-2">
+        <v-row class="d-flex justify-end pa-2 px-6 mt-2 no-uppercase">
           <v-btn 
-            outlined text class="my-2 mx-2 align-self-end"
+            outlined text class="my-2 mx-2 align-self-end no-uppercase"
             @click="moveToPrevStep()"> Back </v-btn>
-          <v-btn 
-            class="my-2 align-self-end" color="primary" 
+          <v-btn :disabled="$store.state.test.tasks.length == 0"
+            class="my-2 align-self-end no-uppercase" color="primary" 
             @click="generateConcreteTasks(); moveToNextStep()">
             Continue 
           </v-btn>
@@ -188,7 +191,7 @@
             
             <!-- Task text -->
             <v-card-subtitle class="mt-1 text-body-1">
-              <p> {{ task.content.text }} </p> 
+              <p> {{ task.content.text }} </p>
             </v-card-subtitle>
             
             <!-- Task questions, answers -->
@@ -256,11 +259,11 @@
 
         <!-- Action buttons -->
         <v-row class="d-flex justify-center align-center pa-2 px-6 mt-2">
-          <v-btn outlined text class="my-2 mb-4 mx-2 align-self-end"
+          <v-btn outlined text class="my-2 mb-4 mx-2 align-self-end no-uppercase"
             @click="moveToPrevStep()"> 
             Back 
           </v-btn>
-          <v-btn class="my-2 mb-4 mx-2 align-self-end" color="primary" 
+          <v-btn class="my-2 mb-4 mx-2 align-self-end no-uppercase" color="primary" 
             @click="saveDialog = true"> 
             Finish
           </v-btn>
@@ -276,8 +279,8 @@
             <v-divider></v-divider>
 
             <v-card-actions>
-              <v-btn color="black" outlined text @click="removeDialog = false"> Cancel </v-btn>
-              <v-btn dark color="red" @click="removeConcreteTask({index: selectedTaskId}); removeDialog = false"> Remove </v-btn>
+              <v-btn color="black" class="no-uppercase" outlined text @click="removeDialog = false"> Cancel </v-btn>
+              <v-btn class="no-uppercase" color="red" @click="removeConcreteTask({index: selectedTaskId}); removeDialog = false"> Remove </v-btn>
             </v-card-actions> 
           </v-card>
         </v-dialog>
@@ -303,8 +306,8 @@
 
               <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="black" outlined text @click="setAnswerOptionDialog = false"> Back </v-btn>
-                  <v-btn dark color="primary"
+                  <v-btn class="no-uppercase" color="black" outlined text @click="setAnswerOptionDialog = false"> Back </v-btn>
+                  <v-btn class="no-uppercase" color="primary"
                     @click="setRenderOption({index: selectedTaskId, renderOption: answerTypes[selectedAnswerType]}); setAnswerOptionDialog = false"> 
                     Save 
                   </v-btn>
@@ -316,17 +319,18 @@
         <!-- Answer type options dialog -->
         <v-dialog v-model="saveDialog" width="450" :retain-focus="false">
             <v-card class="d-flex flex-column rounded-lg pt-2">
-                <p class="pb-4 my-2 font-weight-medium text-h5 align-self-center"> Test Details Overview </p>
+                <v-form v-model="testOk">
+                <p class="pb-4 mt-2 mb-0 mx-4 font-weight-medium text-h5 align-self-center"> Test Details Overview </p>
 
                 <!-- Set task name -->
                 <v-text-field 
-                    class="px-4" v-model="testName" outlined hide-details=""
-                    label="Test name" placeholder="Enter test name" @change="setTestName" >
+                    class="px-4" v-model="testName" outlined hide-details="auto"
+                    label="Test name" :rules="testNameRule" placeholder="Enter test name" @change="setTestName">
                 </v-text-field>
 
-                <v-container class="d-flex flex-row my-3">
+                <v-container class="d-flex flex-row pa-0 py-2 my-3 mx-0">
                   <!-- Selected grade -->
-                  <v-text-field 
+                  <v-text-field
                       class="px-4" v-model="$store.state.test.grade" outlined readonly hide-details=""
                       label="Grade">
                   </v-text-field>
@@ -354,11 +358,11 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="black" outlined text @click="saveDialog= false"> Cancel </v-btn>
-                    <v-btn dark color="primary" @click="createOrSaveTest(); saveDialog = false"> Save </v-btn>
+                    <v-btn class="no-uppercase" color="black" outlined text @click="saveDialog= false"> Cancel </v-btn>
+                    <v-btn class="no-uppercase" color="primary" :loading="loading" :disabled="!testOk" @click="createOrSaveTest()"> Save </v-btn>
                 </v-card-actions>
-                
-            </v-card>
+            </v-form>    
+          </v-card>
         </v-dialog>
 
       </v-stepper-content>
@@ -394,8 +398,16 @@ export default {
             
             placeholderModel: 0,
             saveDialog: false,
+
+            testOk: false,
+            testNameRule: [
+              v => !!v || "Test name cannot be empty!"
+            ],
+
+            loading: false,
         }
     },
+
     methods: {
 
         // function from testData Vuex store 
@@ -421,6 +433,8 @@ export default {
         // Create new test and add selected tasks || Update existing test
         createOrSaveTest() {
 
+          this.loading = true;
+
           try{
 
             if( this.$store.state.test.id == 0 ) {
@@ -444,6 +458,8 @@ export default {
                 }
                 
                 // Return to test list with success message
+                this.loading = false;
+                this.saveDialog = false;
                 this.$router.push({ name: "yourTests" });
                 this.$store.dispatch('showMessage', {message: 'Test created successfuly!'});
               });
@@ -471,12 +487,16 @@ export default {
                   }
 
                   // Return to test list with a success message
+                  this.loading = false;
+                  this.saveDialog = false;
                   this.$router.push({ name: "yourTests" });
                   this.$store.dispatch('showMessage', {message: 'Test successfuly updated!'});
                 });
               });
             }
         } catch(err) {
+          this.loading = false;
+          this.saveDialog = false;
           this.$store.dispatch('showMessage', {message: 'Error while saving test!', success: false});
         }
       },
@@ -487,10 +507,9 @@ export default {
     },
 
     // This function runs before the UI loads
-    beforeMount() {
+    beforeRouteEnter (to, from, next) {
         // Load categories and tasks from the database
-        this.generateConcreteTasks();
-        console.log(this.$store.state.test.selectedTaskCategories);
+        next( async vm => { vm.getTasks(); });
     },
 
     computed: {

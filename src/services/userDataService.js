@@ -1,4 +1,4 @@
-import http from "../../http-common";
+import http from "../../axios.config";
 
 class UserDataService {
   getAll() {
@@ -19,6 +19,10 @@ class UserDataService {
 
   getStudentAssignments(id) {
     return http.get(`/users/${id}/assignments`);
+  }
+
+  getStudentsByGrade(data) {
+    return http.post("users/studentsByGrade", data);
   }
 
   login(data) {

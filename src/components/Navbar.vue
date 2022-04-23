@@ -11,11 +11,11 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn v-if="$store.state.app.loggedIn && $store.state.app.loginType == 'teacher' && $router.url != '/'" @click="moveToCreateTask()" text large class="no-uppercase mx-3" color="primary">
+      <v-btn v-if="$store.state.app.loggedIn && $store.state.app.loginType == 'teacher' && ($route.name != 'home' && $route.name != 'createTask')" @click="moveToCreateTask()" text large class="no-uppercase mx-3" color="primary">
         <span class="">Create task</span>
       </v-btn>                
       
-      <v-btn v-if="$store.state.app.loggedIn && $store.state.app.loginType == 'teacher'" @click="moveToCreateTest()" text large class="no-uppercase mx-3" color="primary">
+      <v-btn v-if="$store.state.app.loggedIn && $store.state.app.loginType == 'teacher' && ($route.name != 'home' && $route.name != 'createTest')" @click="moveToCreateTest()" text large class="no-uppercase mx-3" color="primary">
         <span>Create test</span>
       </v-btn>
 
@@ -74,7 +74,9 @@
       }
     },
 
-    beforeMount() {},
+    beforeCreate() {
+      console.log(this.$route.name);
+    },
 
     methods: {  
       ...mapActions({
@@ -85,6 +87,7 @@
       logoutUser() {
         this.$store.dispatch('setLoggedIn', { value: false });
         localStorage.clear();
+        this.$store.dispatch('showMessage', {message: "You have been logged out."});
         this.moveToPage('login');
       }
     },

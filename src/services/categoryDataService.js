@@ -1,4 +1,4 @@
-import http from "../../http-common";
+import http from "../../axios.config";
 
 class CategoryDataService {
   getAll() {

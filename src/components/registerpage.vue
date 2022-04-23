@@ -1,60 +1,124 @@
 <template>
     <v-overlay :light='true' :dark='false' color="white" opacity="1">
         <v-container class="d-flex flex-column align-center">
-
-                <!-- REGISTER FORM -->
-                <v-form v-model="valid">
-                    <v-container class="d-flex flex-column align-center b-g rounded-lg pa-7 elevation-3">
-                    <!-- LOGO -->
-                        <div class="d-flex align-center mb-6">
-                            <router-link to="/">
-                            <v-img alt="Math Logo by IC" class="shrink" contain src="../assets/math_logo2.svg" width="130"/>
-                            </router-link>
-                        </div>
-
-                        <!-- Name input -->
-                        <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Name</p>
-                        <v-text-field
-                            dense solo type="text" 
-                            prepend-inner-icon="mdi-account-outline"
-                            v-model="name" :rules="rules['required']">
-                        </v-text-field>
-                        <!-- Surname input -->
-                        <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Surname</p>
-                        <v-text-field
-                            dense solo type="text" 
-                            prepend-inner-icon="mdi-account-outline"
-                            v-model="surname" :rules="rules['required']">
-                        </v-text-field>
-
-                        <!-- Type of user -->
-                        <p class="ma-0 pl-1 text-left font-weight-medium align-self-start"> Role </p>
-                        <v-radio-group row v-model="userType" hide-details class="mt-0 mb-2" required>
-                                <v-radio label="Student" value="0"></v-radio>
-                                <v-radio label="Teacher" value="1"></v-radio>
-                        </v-radio-group>
-
-                        <!-- E-mail input -->
-                        <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">E-mail</p>
-                        <v-text-field
-                            dense solo type="text" 
-                            prepend-inner-icon="mdi-at"
-                            required v-model="email" :rules="rules['email']">
-                        </v-text-field>
+            
+            <!-- REGISTER FORM -->
+            <v-form ref="form" v-model="valid" @submit="registerUser($event)">
+                <v-container style="width: 600px" 
+                    class="d-flex flex-column align-center b-g rounded-lg px-7 py-3 elevation-3">
+                    <v-row>
+                        <v-col cols="12" class="d-flex flex-row justify-center">
                         
-                        <!-- Password input -->
-                        <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Password</p>
-                        <v-text-field
-                            dense solo type="password"
-                            prepend-inner-icon="mdi-lock-outline"
-                            required v-model="password" :rules="rules['required']">
-                        </v-text-field>
+                        <!-- LOGO -->
+                            <div class="d-flex align-center mb-2">
+                                <v-img 
+                                    alt="Math Logo by IC" class="shrink" 
+                                    contain src="../assets/math_logo2.svg" width="130"/>
+                            </div>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- Name input -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Name</p>
+                            <v-text-field
+                                style="width: 17.5rem"
+                                dense solo type="text" 
+                                prepend-inner-icon="mdi-account-outline"
+                                v-model="name" :rules="rules['required']">
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- Surname input -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Surname</p>
+                            <v-text-field
+                                style="width: 17.5rem"
+                                dense solo type="text" 
+                                prepend-inner-icon="mdi-account-outline"
+                                v-model="surname" :rules="rules['required']">
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- E-mail input -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">E-mail</p>
+                            <v-text-field
+                                style="width: 17.5rem"
+                                dense solo type="text" 
+                                prepend-inner-icon="mdi-at"
+                                required v-model="email" :rules="rules['email']">
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- Type of user -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start"> Role </p>
+                            <v-radio-group 
+                                    :rules="rules['userRole']" row v-model="userType" class="mt-2 mb-2" required>
+                                    <v-radio value="0">
+                                        <template v-slot:label>
+                                            <span style="color: black"> Student </span>
+                                        </template>
+                                    </v-radio>
+                                    <v-radio value="1">
+                                        <template v-slot:label>
+                                            <span style="color: black"> Teacher </span>
+                                        </template>
+                                    </v-radio>
+                            </v-radio-group>
+                        </v-col>
+
+                        <v-col cols="12" v-if="userType == 0">
+                            <p v-if="userType == 0" class="ma-0 pl-1 text-left font-weight-medium align-self-start">Grade</p>
+                            <v-select v-if="userType == 0"
+                                :items="grades" :rules="rules['required']"
+                                solo dense placeholder="Select grade">
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- Password input -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Password</p>
+                            <v-text-field
+                                style="width: 17.5rem"
+                                dense solo prepend-inner-icon="mdi-lock-outline"
+                                required v-model="password" :rules="rules['required']"
+                                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                :type="showPassword ? 'text' : 'password'"
+                                @click:append="showPassword = !showPassword">
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <!-- Validate Password input -->
+                            <p class="ma-0 pl-1 text-left font-weight-medium align-self-start">Validate Password</p>
+                            <v-text-field
+                                style="width: 17.5rem"
+                                dense solo prepend-inner-icon="mdi-lock-outline"
+                                required v-model="passwordValidate" :rules="rules['validatePassword']"
+                                :append-icon="showPasswordValidate ? 'mdi-eye' : 'mdi-eye-off'"
+                                :type="showPasswordValidate ? 'text' : 'password'"
+                                @click:append="showPasswordValidate = !showPasswordValidate">
+                            </v-text-field>
+                        </v-col>
                         
                         <!-- Buttons -->
-                        <v-btn @click="registerUser()" :loading="loading" block class="px-6 py-2" color="primary"> Register </v-btn>
-                        <v-btn to="/login" :ripple="false" text plain class="mt-4 mb-0 px-3 py-1 no-uppercase text-caption"> I already have an account </v-btn>
-                    </v-container>
-                </v-form>
+                        <v-col class="d-flex flex-column align-center">
+                            <v-btn 
+                                type="submit" :loading="loading" class="px-10 py-2" color="primary">
+                                Register 
+                            </v-btn>
+                            <p 
+                                @click="password = ''; validatePassword = ''; $router.push( {name: 'login'} )" 
+                                :ripple="false" text plain 
+                                class="mt-4 mb-0 px-3 py-1 no-uppercase text-caption" 
+                                style="cursor: pointer"> 
+                                I already have an account 
+                            </p>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-form>
         </v-container>
     </v-overlay>
 </template>
@@ -69,38 +133,59 @@ export default {
             surname: '',
             email: '',
             password: '',
+            passwordValidate: '',
             rules: {
                 email: [
-                    v => !!v || 'E-mail is required',
-                    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+                    v => !!v || 'This field is required',
+                    v => /.+@.+\..+/.test(v) || 'Invalid e-mail address format',
                 ],
                 required: [
                     v => !!v || 'This field is required',
-                ]
+                ],
+                validatePassword: [
+                    v => !!v || 'This field is required',
+                    v => v == this.password || 'Passwords must match'
+                ],
+                userRole: [
+                    v => !!v || 'Please select your role'
+                ],
             },
 
-            userType: 0,
-            userTypes: ['student', 'teacher', 'admin'],
+            userType: -1,
+            userTypes: ['student', 'teacher'],
 
             loading: false,
             valid: false,
+
+            showPassword: false,
+            showPasswordValidate: false,
+
+            grades: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+            grade: null       
         }
     },
 
     methods: {
-        async registerUser() {
+        async registerUser(e) {
+
+            e.preventDefault();
+            if(this.$refs.form.validate() == false) {
+                return;
+            }
+
             const newUser = {
                 name: this.name,
                 surname: this.surname,
                 email: this.email,
                 password: this.password,
+                grade: this.grade ?? "none",
                 type: this.userTypes[this.userType]
             }
 
             this.loading = true;
 
             // Gives a sense of calculation, shows loading to user
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             UserDataService.create(newUser)
             .then((res) => {
@@ -110,10 +195,9 @@ export default {
                 this.$store.dispatch('showMessage', {message: 'Account created! You can now log in.'});
             })
             .catch((err) => {
-                // TODO nevyplnene udaje
                 console.log("Error:", err);
                 this.loading = false;
-                this.$store.dispatch('showMessage',{message: "Something went wrong!", success: false});
+                this.$store.dispatch('showMessage',{message: "Sorry, something went wrong!", success: false});
             })
         }
     }

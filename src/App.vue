@@ -1,6 +1,9 @@
 <template>
   <v-app class="custom-font">
 
+    <!-- NOTIFICATIONS ON TOP -->
+    <globalSnackbarVue></globalSnackbarVue>
+
     <!-- NAVBAR -->
     <NavbarVue/>
 
@@ -9,30 +12,27 @@
       <router-view/>
     </v-main>
 
-    <!-- NOTIFICATIONS ON TOP -->
-    <globalSnackbarVue></globalSnackbarVue>
-  
   </v-app>
 </template>
 
 <script>
-import NavbarVue from "./components/Navbar.vue";
-import globalSnackbarVue from "./components/globalSnackbar.vue";
+  import NavbarVue from "./components/Navbar.vue";
+  import globalSnackbarVue from "./components/globalSnackbar.vue";
 
-export default {
-  name: 'App',
+  export default {
+    name: 'App',
 
-  components: {
-    NavbarVue,
-    globalSnackbarVue
-  },
+    components: {
+      NavbarVue,
+      globalSnackbarVue
+    },
 
-  beforeCreate() {
-    // prevent unwanted popup of snackbar at page reload
-    this.$store.dispatch('hideMessage');
-  }
+    beforeCreate() {
+      // prevent unwanted popup of snackbar at page reload
+      this.$store.dispatch('hideMessage');
+    }
 
-};
+  };
 </script>
 
 <style>
@@ -47,7 +47,6 @@ export default {
 
   .b-g {
     background-color: var(--green-background-color);
-    height: 95%;
   }
 
   .b-p {
@@ -62,9 +61,6 @@ export default {
     text-decoration: underline;
   }
 
-  /*.custom-font {
-    font-family: 'Raleway', sans-serif;
-  }*/
   .t-t-color {
     color: var(--main-text-color) !important;
   }

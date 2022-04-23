@@ -1,15 +1,18 @@
 <template>
     <v-container class="d-flex flex-column">
+        <v-skeleton-loader type="text" v-if="loading"></v-skeleton-loader>
         <p class="text-h4 align-self-center"> {{ testName }} </p>
 
         <!-- Time for task -->
-        <v-card outlined class="mx-6 my-2 px-6 py-3">
-        <p class="ma-0 py-2 text-body-1"> 
-            Time remaining: <span class="font-weight-medium text-subtitle-1">{{ timer }}</span>
-        </p>
+        <v-skeleton-loader type="card" v-if="loading" > </v-skeleton-loader>
+        <v-card outlined class="mx-6 my-2 px-6 py-3" v-if="!loading">
+          <p class="ma-0 py-2 text-body-1"> 
+              Time remaining: <span class="font-weight-medium text-subtitle-1">{{ timer }}</span>
+          </p>
         </v-card>
 
         <!-- Cards with task details, render options preview -->
+
         <v-card v-for="(task, tIndex) in test.content"
             :key="tIndex" hover outlined class="my-2 mx-6 px-3">
             <!-- Task name -->
@@ -76,7 +79,7 @@
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'text'"> 
                   <div class="dflex flex-column py-1 mr-4" v-for="(answer, optIndex) in question.answers" :key="optIndex">
                       <v-text-field dense
-                        label="Asnwer"
+                        label="Answer"
                         v-model="test.content[tIndex].content.questions[i].answers[optIndex].selected"
                         outlined
                       ></v-text-field>
@@ -88,10 +91,11 @@
           </v-card>
 
           <!-- Action buttons -->
-          <v-row class="d-flex justify-end align-center pa-2 px-6 mt-2">
-            <v-btn outlined class="my-2 mb-4 mx-2 align-self-end" text @click="$router.push({name: 'yourAssignments'})"> Back </v-btn>
-            <v-btn outlined color="primary" class="my-2 mb-4 mx-2 align-self-end" @click="saveAnswers()"> Save answers </v-btn>
-            <v-btn class="my-2 mb-4 mx-2 align-self-end" color="primary" @click="finishTest()"> Finish test </v-btn>
+          <v-skeleton-loader type="text" v-if="loading"></v-skeleton-loader>
+          <v-row class="d-flex justify-end align-center pa-2 px-7 mt-2" v-if="!loading" >
+            <v-btn outlined class="my-2 mb-4 mx-2 align-self-end no-uppercase" text @click="$router.push({name: 'yourAssignments'})"> Back </v-btn>
+            <v-btn outlined color="primary" class="my-2 mb-4 mx-2 align-self-end no-uppercase" @click="saveAnswers()"> Save answers </v-btn>
+            <v-btn class="my-2 mb-4 mx-2 align-self-end no-uppercase" color="primary" @click="finishTest()"> Finish test </v-btn>
           </v-row>
         </v-container>
 </template>
@@ -102,11 +106,13 @@
   export default {
       data() {
           return {
-              testName: 'New Test Name',
+              testName: '',
 
               // tasks
               test: {},
               timer: "",
+              timeout: null,
+              loading: false,
 
               // remove task dialog
               exitDialog: false,
@@ -120,10 +126,10 @@
             concreteTestDataService.update(this.$route.params.id, {
               content: this.test.content
             }).then(({data}) => {
-              console.log(data);
+              //console.log(data);
               this.$store.dispatch('showMessage', {message: "Answers saved!"});
             }).catch((err) => {
-              console.log(err);
+              //console.log(err);
               this.$store.dispatch('showMessage', {message: "Error occured while saving answers...", success: false});
             })
           },
@@ -136,13 +142,14 @@
               finishedAt: new Date()
             }).then(async ({data}) => {
               // Test completed
-              console.log(data);
+              // console.log(data);
+              clearTimeout(this.timeout);
 
               this.$router.push({name: 'yourAssignments'});
               this.$store.dispatch('showMessage', {message: "Test completed!"});
             }).catch((err) => {
               // error
-              console.log(err);
+              // console.log(err);
               
               this.$store.dispatch('showMessage', {message: "Error occured while saving answers...", success: false});
               this.$router.push({name: 'yourAssignments'});
@@ -151,7 +158,7 @@
 
           async syncTime() {
 
-              console.log(this.test.content);
+              // console.log(this.test.content);
 
               // If the timestamps are out of line, test is over
               let concreteTest = await concreteTestDataService.get(this.$route.params.id);
@@ -160,21 +167,26 @@
               let shouldFinishBefore = new Date(concreteTest.data.shouldFinishBefore);
               let now = new Date();
 
-              console.log("SHOULD FINISH: ", shouldFinishBefore, "NOW: ", now);
-
               // Check if timer should ran out
               if( now >= shouldFinishBefore ) {
-                  // Update test status to finished and ending timestamp
-                  let response = await concreteTestDataService.update(this.$route.params.id, { 
-                    status: "Finished", 
-                    finishedAt: now
-                  });
 
                   // Return back to yourAssignments page and show snackbar message
-                  if( response ) {
-                    this.$router.push({name: "yourAssignments"});
-                    this.$store.dispatch('showMessage', {message: "Time limit reached!", success: false});
-                  }
+                    concreteTestDataService.update(this.$route.params.id, {
+                      content: this.test.content,
+                      status: "Finished", 
+                      finishedAt: new Date()
+                    }).then(async ({data}) => {
+                      // Test completed
+                      // console.log(data);
+
+                      this.$router.push({name: 'yourAssignments'});
+                      this.$store.dispatch('showMessage', {message: "Time limit reached!", success: false});
+                    }).catch((err) => {
+                      // error
+                      // console.log(err);
+                      this.$store.dispatch('showMessage', {message: err.response.data.message, success: false});
+                    });                  
+                  
               } else {
                   // Get minutes and seconds remaining
                   let minutes = Math.trunc( ((shouldFinishBefore - now) / (1000 * 60)) );
@@ -186,34 +198,44 @@
 
                   // Save value
                   this.timer =  `${minutes}m : ${seconds}s`;
-                  setTimeout(this.syncTime, 1000);
+                  this.timeout = setTimeout(this.syncTime, 1000);
               }
           },
 
           // Get selected test for starting
           async retrieveTest() {
               // Get ConcreteTest by ID from URL
-              let response = await concreteTestDataService.get(this.$route.params.id); 
-              
-              // Save test locally
-              this.test = response.data;
-              console.log("TEST", this.test);
 
-              // Check if the student started working on the test or reloaded the window/browser
-              if( this.test.status == 'Handed Out' ) {
-                  concreteTestDataService.update(
-                      this.$route.params.id, { 
-                          status: "In Progress", 
-                          shouldFinishBefore: new Date( (new Date()).getTime() + this.test.timeLimit * 60000)
-                      }
-                  // Wait until the shouldFinishBefore value updates in the DB
-                  ).then((response) => {
-                      // Each subsequent second, sync remaining time to shouldFinishBefore in DB
-                      this.syncTime();
-                  })
-              } else {
-                // Start remaining time counter
-                this.syncTime();
+              try{
+                this.loading = true;
+                let response = await concreteTestDataService.get(this.$route.params.id); 
+                
+                // Save test locally
+                this.test = response.data;
+                this.testName = this.test.name;
+
+                // Check if the student started working on the test or reloaded the window/browser
+                if( this.test.status == 'Handed Out' ) {
+                    concreteTestDataService.update(
+                        this.$route.params.id, { 
+                            status: "In Progress", 
+                            startedAt: new Date(),
+                            shouldFinishBefore: new Date( (new Date()).getTime() + this.test.timeLimit * 60000)
+                        }
+                    // Wait until the shouldFinishBefore value updates in the DB
+                    ).then((response) => {
+                        this.loading = false;
+                        // Each subsequent second, sync remaining time to shouldFinishBefore in DB
+                        this.syncTime();
+                    });
+                } else {
+                  // Start remaining time counter
+                  this.loading = false;
+                  this.syncTime();
+                }
+              } catch(error) {
+                this.$store.dispatch('showMessage', { message: error.message, success: false });
+                // console.log(error.message);
               }
           },
       },

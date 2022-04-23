@@ -15,21 +15,30 @@
             </v-card-title>
             
             <v-data-table
+                :loading="loading" loading-text="Loading tests... Please wait"
                 :headers="headers" :items="tests" :items-per-page="7" :search="search" width="80%">
                 <template v-slot:item="row">
                     <tr>
                         <td>{{ row.item.name }}</td>
+                        <td>{{ row.item.grade }}</td>
                         <td>{{ getHumanReadableTimestamp(row.item.last_mod) }}</td>
 
-                        <td class="px-12">
+                        <td class="px-3">
                         <v-btn plain class="pa-0" :ripple="false" @click.stop="openHandOutDialog(row.item)">
                             <v-icon class="pa-0 ma-0" color="primary">
                                 mdi-clipboard-arrow-up-outline
                             </v-icon>
                         </v-btn>
                         </td>
-                        <td class="px-0">
-                        <v-btn plain class="pa-1" :ripple="false" @click="modifyTest(row.item)">
+                        <td class="px-4">
+                        <v-btn plain class="pa-1" :disabled="!wasHandedOut(row.item)" :ripple="false" @click="showTestResults(row.item)">
+                            <v-icon color="var(--main-text-color)">
+                                mdi-file-eye-outline
+                            </v-icon>
+                        </v-btn>
+                        </td>
+                        <td class="pl-8">
+                        <v-btn plain class="mr-4" :ripple="false" @click="modifyTest(row.item)">
                             <v-icon color="var(--main-text-color)">
                                 mdi-pencil-outline
                             </v-icon>
@@ -79,7 +88,20 @@
                     Select students to assign the test to
                 </v-card-text>
 
-                <v-virtual-scroll :items="students" :item-height="40" height="350">
+                <v-skeleton-loader v-if="studentLoading" type="list-item-avatar@8"></v-skeleton-loader>
+                <p class="mx-6" v-if="students.length == 0"> No students registered in that grade. </p>
+                <div v-if="!studentLoading && students.length != 0" class="d-flex justify-end align-center">
+                   <v-list-item class="px-5">
+                        <v-list-item-content>
+                            <v-list-item-title> Select all students </v-list-item-title>
+                        </v-list-item-content>
+
+                        <v-list-item-action>
+                            <v-checkbox v-model="isAllSelected" @change="selectAllStudents()" ></v-checkbox>
+                        </v-list-item-action>
+                    </v-list-item>
+                </div>
+                <v-virtual-scroll v-if="!studentLoading" :items="students" :item-height="40" height="350">
                     <template v-slot:default="{ item }">
                         <v-list-item class="px-5">
                             <v-list-item-avatar>
@@ -103,10 +125,10 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text outlined @click="handoutDialog = false">
+                    <v-btn text outlined :disabled="handoutLoading" class="no-uppercase" @click="handoutDialog = false">
                         Cancel
                     </v-btn>
-                    <v-btn :disabled="!selectedStudents.length" color="primary" @click="handoutTest()">
+                    <v-btn :loading="handoutLoading" class="no-uppercase" :disabled="!selectedStudents.length" color="primary" @click="handoutTest()">
                         Hand out
                     </v-btn>
                 </v-card-actions>
@@ -131,9 +153,11 @@ import userDataService from '../services/userDataService';
                 deleteDialog: false, // Show 'Are you sure' dialog for deletion
                 search: "",
                 headers: [
-                    {text: "Test name", value: "name", width: "50ch"},
-                    {text: "Last Modified", value: "last_mod", width: "45ch"},
-                    {text: "Hand out", value: "delete", align: "center", sortable: false, width: "5ch"},
+                    {text: "Test name", value: "name", width: "25ch"},
+                    {text: "Grade", value: "grade", width: "25ch"},
+                    {text: "Last Modified", value: "last_mod", width: "45ch", },
+                    {text: "Hand out", value: "delete", align: "center", sortable: false, width: "1ch"},
+                    {text: "Results", value: "delete", align: "center", sortable: false, width: "1ch"},
                     {text: "Modify", value: "modify", align: "center", sortable: false, width: "1ch" },
                     {text: "Delete", value: "delete", align: "center", sortable: false, width: "1ch" },
                 ],
@@ -144,7 +168,12 @@ import userDataService from '../services/userDataService';
                 students: [],
                 selectedStudents: [],
 
-                loadStudents: false
+                loadStudents: false,
+                selectAll: false,
+
+                loading: false,
+                handoutLoading: false,
+                studentLoading: false,
             };
         },
 
@@ -154,7 +183,20 @@ import userDataService from '../services/userDataService';
             });
         },
 
-        computed: { },
+        computed: { 
+            /* isAllSelected() {
+                return this.students.length == this.selectedStudents.length
+            }, */
+
+            isAllSelected: {
+                get () {
+                    return this.students.length == this.selectedStudents.length
+                },
+                set (value) {
+                    this.selectAll = value;
+                }
+            }
+        },
 
         created() { },
 
@@ -166,6 +208,34 @@ import userDataService from '../services/userDataService';
 
         methods: { 
 
+            showTestResults(test) {
+                this.$router.push({name: "viewStudentResults", params: { id: test.id }});
+            },
+
+            wasHandedOut(test) {
+                return test.created.length != 0;
+            },
+
+            selectAllStudents() {
+                console.log(this.selectedStudents);
+
+                if( this.selectAll ) {
+                    this.students.forEach((student) => {
+                        if(!this.selectedStudents.find((id) => id == student.id ) ) {
+                            this.selectedStudents.push(student.id);
+                        }
+                    });
+                } else {
+                    this.students.forEach((student) => {
+                        let index = this.selectedStudents.findIndex((id) => id == student.id )
+                        if(index != -1) {
+                            this.selectedStudents.splice(index, 1);
+                        }
+                    });
+                }
+                
+            },
+
             ...mapActions({
                 startTestModification: 'test/startTestModification'
             }),
@@ -173,59 +243,73 @@ import userDataService from '../services/userDataService';
             // Hand out test to students
             async handoutTest() {
 
-                // Get selected AbstractTest
-                let abstractTest = await TestDataService.get(this.selectedTestID);
+                try {
+                    this.handoutLoading = true;
 
-                // Extract abstractTasks
-                let abstractTasks = abstractTest.data.tasks.map((task) => {
-                    return {
-                        content: task.content,
-                        renderOption: task.testTasks.renderOption
-                    }
-                });
+                    // Get selected AbstractTest
+                    let abstractTest = await TestDataService.get(this.selectedTestID);
 
-                // For each selected student
-                this.selectedStudents.forEach(async (student) => {
-
-                    // Generate ConcreteTasks from AbstractTasks
-                    let generated = await generatorService.generateMultiple({ abstractTasks });
-                    console.log('HERE IS THE CONCRETE TASKS', generated.data.concreteTasks);
-
-                    // Save expected answers
-                    let expectedAnswers = [];
-                    for(let concreteTask of generated.data.concreteTasks) {
-                        console.log(concreteTask.content.expectedAnswers);
-                        expectedAnswers = expectedAnswers.concat([...concreteTask.content.expectedAnswers]);
-                        delete concreteTask.content.expectedAnswers
-                    }
-                    
-
-                    // Create a new ConcreteTest
-                    concreteTestDataService.create({
-                        name: abstractTest.data.name,
-                        timeLimit: abstractTest.data.timeLimit,
-                        // tasks {content, renderOption}
-                        content: generated.data.concreteTasks,
-                        expectedAnswers: expectedAnswers,
-                        createdFrom: this.selectedTestID,
-                        assignedTo: student,
-                        assignedBy: this.$store.state.app.userID 
-                    }).then(({data}) => {
-                        console.log(data);
-                        this.handoutDialog = false;
-                    }).catch((err) => {
-                        console.log(err.data.message);
+                    // Extract abstractTasks
+                    let abstractTasks = abstractTest.data.tasks.map((task) => {
+                        return {
+                            content: task.content,
+                            renderOption: task.testTasks.renderOption
+                        }
                     });
 
-                });
+                    // For each selected student
+                    
+                    for(let student of this.selectedStudents) {
+
+                        // Generate ConcreteTasks from AbstractTasks
+                        let generated = await generatorService.generateMultiple({ abstractTasks });
+                        console.log('HERE IS THE CONCRETE TASKS', generated.data.concreteTasks);
+
+                        // Save expected answers
+                        let expectedAnswers = [];
+                        for(let concreteTask of generated.data.concreteTasks) {
+                            console.log(concreteTask.content.expectedAnswers);
+                            expectedAnswers = expectedAnswers.concat([...concreteTask.content.expectedAnswers]);
+                            delete concreteTask.content.expectedAnswers
+                        }
+                        
+
+                        // Create a new ConcreteTest
+                        let concreteTest = await concreteTestDataService.create({
+                            name: abstractTest.data.name,
+                            timeLimit: abstractTest.data.timeLimit,
+                            // tasks {content, renderOption}
+                            content: generated.data.concreteTasks,
+                            expectedAnswers: expectedAnswers,
+                            createdFrom: this.selectedTestID,
+                            assignedTo: student,
+                            assignedBy: this.$store.state.app.userID
+                        });
+                    }
+
+                    this.handoutLoading = false;
+                    this.handoutDialog = false;
+                    this.$store.dispatch("showMessage", { message: "Tests successfuly handed out!" });
+                } catch(error) {
+                    this.handoutLoading = false;
+                    this.$store.dispatch("showMessage", { message: error.response.data.message, sucess: false });
+                }
             },
 
+            // Opens the dialog window to hand out tests to students
             async openHandOutDialog(test) {
                 this.students = [];
                 this.selectedStudents = [];
 
+                // Show loading and open dialog
+                this.studentLoading = true;
+                this.handoutDialog = true;
+
                 // Get all users and filter students
-                userDataService.getAll().then(({data}) => {
+                userDataService.getStudentsByGrade({grade: test.grade}).then(({data}) => {
+
+                    console.log(data);
+
                     this.students = data.filter(({type}) => type == "student").map((student) => {
                         return {
                             id: student.id,
@@ -233,7 +317,9 @@ import userDataService from '../services/userDataService';
                             surname: student.surname,
                         }
                     });
-                    this.handoutDialog = true;
+                    this.studentLoading = false;
+                }).catch((err) => {
+                    this.$store.dispatch("showMessage", {message: "Sorry, an error occurred while loading students...", success: false});
                 });
 
                 // Save hand out testID
@@ -276,18 +362,25 @@ import userDataService from '../services/userDataService';
                 return {
                     id: test.id,
                     name: test.name,
-                    last_mod: test.updatedAt
+                    last_mod: test.updatedAt,
+                    created: test.created,
+                    grade: test.grade
                 };
             },
+
             // Get tasks from database
             retrieveTests() {
+              this.loading = true;
               TestDataService.getAll()
                 .then((response) => {
                   this.tests = response.data.map(this.getDisplayTest);
-                  console.log(response.data);
+                  //console.log(response.data);
+                  this.loading = false;
                 })
                 .catch((e) => {
                   console.log(e);
+                  this.loading = false;
+                  this.$store.dispatch('showMessage', { message: e.message });
                 });
             },
         },

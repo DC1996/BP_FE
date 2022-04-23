@@ -18,6 +18,8 @@
             </v-card-title>
             
             <v-data-table
+            :loading="loading"
+            loading-text="Loading tasks... Please wait"
             :headers="headers"
             :items="tasks"
             :items-per-page="7"
@@ -132,9 +134,6 @@
                 })
                 .catch((err) => {
                     this.$store.dispatch('showMessage', {message: err.resposne.data.message });
-                    this.message = err.response.data.message;
-                    this.success = false;
-                    this.infoMessage = true;
                     this.retrieveTasks();
                     this.deleteDialog = false;
                 })
@@ -150,13 +149,17 @@
             },
             // get tasks from database
             retrieveTasks() {
+              this.loading = true;
               TaskDataService.getAll()
                 .then((response) => {
                   this.tasks = response.data.map(this.getDisplayTask);
-                  console.log(response.data);
+                  this.loading = false;
+                  //console.log(response.data);
                 })
                 .catch((e) => {
-                  console.log(e);
+                    this.loading = false;
+                    this.$store.dispatch("showMessage", { message: e.reponse.data.message });
+                    //console.log(e);
                 });
             },
         },

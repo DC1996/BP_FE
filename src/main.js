@@ -2,14 +2,12 @@ import Vue from "vue";
 import App from "./App.vue";
 import VueRouter from "vue-router";
 import Navbar from "./components/Navbar.vue";
-import homepageVue from "./components/homepage.vue";
+import homepageVue from "./components/pages/homepage.vue";
 import yourtasksVue from "./components/yourtasks.vue";
 import yourtestsVue from "./components/yourtests.vue";
 import createtaskpageVue from "./components/createtaskpage.vue";
 import createTestPageVue from "./components/createTestPage.vue";
-import AppCreateTaskVue from "./components/AppCreateTask.vue";
-
-import loginpageVue from "./components/loginpage.vue";
+import loginpageVue from "./components/pages/loginpage.vue";
 import registerpageVue from "./components/registerpage.vue";
 
 import globalSnackbar from "./components/globalSnackbar.vue";
@@ -34,6 +32,7 @@ Vue.use(MathJax);
 
 // MathJax
 import VueMathjax from "vue-mathjax";
+import viewStudentsResultsVue from "./components/pages/viewStudentsResults.vue";
 Vue.use(VueMathjax);
 
 // Allow access to components
@@ -41,11 +40,11 @@ Vue.use(store);
 Vue.use(Vuetify);
 Vue.use(VueRouter);
 Vue.use(globalSnackbar);
+Vue.use(App);
 Vue.use(Navbar);
 Vue.use(loginpageVue);
 Vue.use(registerpageVue);
-Vue.use(App);
-Vue.use(AppCreateTaskVue);
+Vue.use(viewStudentsResultsVue);
 Vue.use(createtaskpageVue);
 Vue.use(createTestPageVue);
 Vue.use(modifyTestPageVue);
@@ -74,21 +73,23 @@ Vue.mixin({
     },
     // Transform timestamp to readable format
     getHumanReadableTimestamp(timestamp) {
-
       console.log("TIME:", timestamp);
 
       let [date, time] = timestamp.split(" ");
-      
+
       let [year, month, day] = date.split("-");
       let [hours, minutes] = time.split(":", 2);
 
-      return `${day[0] == '0' ? day[1] : day}.${month[0] == '0' ? month[1] : month}.${year} ${hours}:${minutes}`
+      return `${day[0] == "0" ? day[1] : day}.${
+        month[0] == "0" ? month[1] : month
+      }.${year} ${hours}:${minutes}`;
     },
   },
 });
 
 // Router instance
 const router = new VueRouter({
+  mode: "history",
   // Define web app routes
   routes: [
     { path: "/", name: "home", component: homepageVue },
@@ -99,6 +100,11 @@ const router = new VueRouter({
     { path: "/createTask", name: "createTask", component: createtaskpageVue },
     { path: "/createTest", name: "createTest", component: createTestPageVue },
     { path: "/takeTest/:id", name: "takeTest", component: takeTestPageVue },
+    {
+      path: "/viewStudentResults/:id",
+      name: "viewStudentResults",
+      component: viewStudentsResultsVue,
+    },
 
     {
       path: "/yourAssignments",
@@ -137,15 +143,26 @@ async function authorizeUserType(type) {
 }
 
 router.beforeEach(async (to, from, next) => {
-  let studentLogin = await authorizeUserType("student");
-  let teacherLogin = await authorizeUserType("teacher");
+  // Load save user type
+  let userType = store.state.app.loginType;
+  let loggedIn = await authorizeUserType(userType ?? "");
+
+  console.log("LOGIN: ", loggedIn, userType);
 
   // Going to login
   if (to.name == "login") {
+    if (loggedIn == true) {
+      // Return signed in user to homepage
+      store.dispatch("showMessage", {
+        message: "Already logged in!",
+      });
+      next({ name: "home" });
+    }
     next();
   } else if (
     // Student can access homepage, take a test, assignments
-    studentLogin &&
+    loggedIn &&
+    userType == "student" &&
     to.name != "yourAssignments" &&
     to.name != "home" &&
     to.name != "takeTest" &&
@@ -159,7 +176,8 @@ router.beforeEach(async (to, from, next) => {
     next({ name: "home" });
   } else if (
     // Teacher can go anywhere except take a test and assignemnts
-    teacherLogin &&
+    loggedIn &&
+    userType == "teacher" &&
     (to.name == "yourAssignments" || to.name == "takeTest")
   ) {
     // Return signed in user to homepage
@@ -168,7 +186,7 @@ router.beforeEach(async (to, from, next) => {
       success: false,
     });
     next({ name: "home" });
-  } else if (!teacherLogin && !studentLogin && to.name != "register") {
+  } else if (!loggedIn && to.name != "register" && to.name != "login") {
     // Take user to login page if not signed in
     store.dispatch("showMessage", {
       message: "Login to continue to this page!",

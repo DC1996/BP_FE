@@ -1,5 +1,7 @@
 <template>
-    <v-container id="task" class="d-flex flex-column justify-start align-center mt-2 pb-0 b-g rounded-lg" style="position: relative;">
+    <v-container
+        class="d-flex flex-column justify-start flex-grow-1 align-center mt-2 pb-1 rounded-lg"
+        id="task" style="position: relative; min-height: 92.5%; background-color: var(--green-background-color)">
 
         <v-btn elevation="1" large color="primary" icon style="position: absolute; left: 0.5rem; background-color: white"
             class="px-6 py-2 mx-2 no-uppercase" @click="helpDialog = true"> 
@@ -9,7 +11,7 @@
         <!-- Task name -->        
         <h4 class="text-h5 custom-font my-4 font-weight-bold"> {{ this.name }} </h4>
 
-        <v-container fluid rounded label="Task" class="d-flex flex-row" style="height: 100%;">
+        <v-container fluid class="d-flex flex-row flex-grow-1">
 
             <!-- Left side -->
             <v-col cols="16" class="mx-2 py-0 px-2 ma-0 d-flex flex-column justify-start">
@@ -18,11 +20,11 @@
             <div class="d-flex flex-column justify-start flex-grow-0">
                 <h3 class="ml-2 mb-1"> Task text </h3>
                 <v-textarea text-narrow spellcheck="false" background-color="white" color="black"
-                    id="task-text" class="text-h3 pb-2" v-model="text" solo no-resize hide-details rows="5">
+                    id="task-text" class="text-h3 pb-2" @keyup="autoParseText" v-model="text" solo auto-grow hide-details rows="4">
                 </v-textarea>
             </div>
 
-            <div style="height: 220px; overflow-y: auto">
+            <div>
             <!-- Variables chips section -->
             <h3 class="ml-2 mb-1"> Variables </h3>          
                 <div class="d-flex flex-row flex-wrap align-center ma-0 pa-0 minus">
@@ -45,7 +47,11 @@
                 <!-- Answers chips section -->
                 <h3 class="ml-2">Answers</h3>
                     <div class="d-flex flex-row flex-wrap align-center ma-0 pa-0 minus">
-                        <p class="text-body-2 mx-2" v-if="ext_text.task.answers.length == 0" >No Answers found. Add answers to questions. </p>
+                        <p 
+                            class="text-body-2 mx-2" 
+                            v-if="ext_text.task.answers.length == 0" >
+                            No Answers found. Add Answers to questions.
+                        </p>
                         <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="ma-0 pa-0">
                             <v-chip v-if="answer.visible" @click="answerInfo(i)"
                                 color="primary" label class="mx-2 my-1 px-6 py-4 pointer">
@@ -59,7 +65,7 @@
             <v-overlay :value="taskOverlay" :light="true" :dark="false">
                 <v-sheet
                     elevation="4" width="650"
-                    style="height: 600px; overflow-y: auto"
+                    style="max-height: 600px; overflow-y: auto"
                     class="pa-4 ma-2 d-flex flex-column justify-flex-start align-flex-start rounded-lg">
 
                     <h4 class="mx-2 pa-1 text-h5 d-flex justify-space-between text-h5">
@@ -69,71 +75,155 @@
                     </v-btn>
                     </h4>
 
-                    <h3 class="ma-2 pa-1"> {{ preview.text.trim() }} </h3>
+                    <!-- <h3 class="ma-2 pa-1"> {{ preview.text.trim() }} </h3>
                     <div id="latex-task" class="d-flex flex-column ma-2 pa-1" v-for="(q, i) in preview.questions" :key="'q' + i">
                         
                         <h4 class="ma-1"> {{ replaceAnswers(q.text.trim()) }} </h4>
 
                         <div id="latex-task" class="ma-1 pa-1" v-for="(a, i) in q.answers" :key="'a' + i">
-                            <p v-for="(item, index) in a.correct" :key="index"> a) {{item}} </p>
-                            <p v-for="(item, index) in a.incorrect" :key="'ia' + index"> 
+                            <p v-for="(item, index) in a.options" :key="'ia' + index"> 
                                 {{ String.fromCharCode(98 + index) + ')'}} {{item}}
                             </p>
                         </div>
-                    </div>
+                    </div> -->
+
+                    <!-- Cards with task details, render options preview -->
+                    <v-card class="my-2 mx-1 px-3">
+                        <!-- Task name -->
+                        <v-card-title class="d-flex justify-space-between text-h5 font-weight-medium">
+                        {{ taskName }}
+                        <v-select style="max-width: 150px"
+                            dense :items="previewRenderOptions"
+                            v-model="selectedPreviewRenderOption" 
+                            label="Answer type" outlined>
+                        </v-select>
+                        </v-card-title>
+                        
+                        <!-- Task text -->
+                        <v-card-subtitle class="mt-1 text-body-1">
+                        <p> {{ preview.text }} </p> 
+                        </v-card-subtitle>
+                        
+                        <!-- Task questions, answers -->
+                        <v-card-text>
+                        <div 
+                            class="d-flex flex-column justify-center align-start"  
+                            v-for="(question, i) in preview.questions" :key="i">
+
+                            <!-- Question -->
+                            <div class="d-flex flex-row justify-flex-start align-center">
+                            <p class="font-weight-bold align-self-center ma-0 mt-2 text-subtitle-1"> 
+                                <span class="font-weight-medium text-body-1"> {{ i+1 }}. Question </span><br>
+                                {{ question.text.replace(/@.+/, '') }}
+                            </p>
+                            </div>
+
+                            <!-- Answers -->
+                            <div v-if="selectedPreviewRenderOption == 'select'" class="d-flex flex-row justify-space-between mb-1"> 
+                                <div v-for="(answer, index) in question.answers" :key="index"
+                                    class="d-flex flex-column py-4">
+                                    <v-select style="max-width: 200px"
+                                        dense :items="answer.options" 
+                                        label="Answer" outlined>
+                                    </v-select>
+                                </div>
+                            </div>
+
+                            
+                            <div v-if="selectedPreviewRenderOption == 'radio'" class="d-flex flex-row justify-space-between mb-1">  
+                                <div class="d-flex flex-column" v-for="(answer, index) in question.answers" :key="index">
+                                    <v-radio-group readonly>
+                                    <v-radio dense class="py-1"
+                                        v-for="(value, i) in answer.options"
+                                        :key="value.toString() + i" :label="value.toString()" :value="i">
+                                    </v-radio>
+                                    </v-radio-group>
+                                </div>
+                            </div>
+
+                            
+                            <div class="d-flex flex-row justify-space-between mb-1" v-if="selectedPreviewRenderOption == 'checkbox'"> 
+                                <div class="d-flex flex-column py-1 px-2" v-for="(answer, index) in question.answers" :key="index">
+                                    <p> {{ answer.name }} </p>
+                                    <v-checkbox dense class="pa-0 ma-0" 
+                                        v-for="(value, i) in answer.options"
+                                        :key="value.toString()" :label="value.toString()" :value="i">
+                                    </v-checkbox>
+                                </div>
+                            </div>
+
+                            
+                            <div class="d-flex flex-row justify-space-between mb-1" v-if="selectedPreviewRenderOption == 'text'">
+                                <div class="dflex flex-column py-1 mr-2" v-for="(answer, index) in question.answers" :key="index">
+                                    <v-text-field dense label="Answer" outlined></v-text-field>
+                                </div>
+                            </div>
+
+                        </div>
+                        </v-card-text>
+                    </v-card>
+
+
                 </v-sheet>
             </v-overlay>
 
             </v-col>
             
             <!-- Right side -->
-            <v-col cols="16" class="mx-2 pa-0 d-flex flex-column justify-space-between">
-
-            <!-- Questions section -->
-            <div class="d-flex flex-column justify-start flex-grow-0">
-                <h3 class="ml-2 mb-0"> Questions </h3>
-                <div class="d-flex flex-column justify-start" style="height: 300px; overflow-y: auto">
-                    <div
-                        class="d-flex flex-row align-center" 
-                        v-for="(question, i) in ext_text.task.questions" :key="i">
-                        <v-text-field
-                            :label="'Task question #' + i"
-                            placeholder="eq.: What is the result? @res"
-                            solo hide-details color="error"
-                            class="my-1 d-flex flex-grow-1"
-                            v-model="ext_text.task.questions[i].text">
-                            <template v-slot:append>
-                                <v-icon color="error" @click="removeQuestion(i)">mdi-delete-empty</v-icon>
-                            </template>
-                        
-                        </v-text-field>
+            <v-col cols="16" class="mx-2 pa-0 d-flex flex-grow-1 flex-column justify-space-between">
+                <!-- Questions section -->
+                <div class="d-flex flex-column justify-start">
+                    <h3 class="ml-2"> Questions </h3>
+                    <div class="d-flex flex-column justify-start">
+                        <v-form ref="qForm" style="width: 100%">
+                            <div
+                                class="d-flex flex-row align-center" 
+                                v-for="(question, i) in ext_text.task.questions" :key="i">
+                            
+                                <!-- Question text-field -->
+                                <v-text-field
+                                    @keyup="autoParseText"
+                                    :rules="questionRules"
+                                    :label="'Task question #' + i"
+                                    placeholder="eq.: What is the result? @res"
+                                    solo color="error" hide-details="auto"
+                                    class="d-flex flex-grow-1 my-1"
+                                    v-model="ext_text.task.questions[i].text">
+                                    <template v-slot:append>
+                                        <v-icon color="error" @click="removeQuestion(i)">mdi-delete-empty</v-icon>
+                                    </template>
+                                </v-text-field>
+                            
+                            </div>
+                        </v-form>
+                        <!-- Add question button -->
+                        <v-btn @click="addQuestion" depressed class="no-uppercase align-self-start mt-1">
+                            <v-icon>mdi-plus</v-icon>  
+                            Add Question 
+                        </v-btn>
                     </div>
-                    <!-- Add question button -->
-                    <v-btn @click="addQuestion" depressed class="my-1 no-uppercase align-self-start">
-                        <v-icon>mdi-plus</v-icon>  
-                        Add Question 
-                    </v-btn>
                 </div>
-            </div>
-            <div class="d-flex flex-row mt-2 mb-1 justify-self-end justify-end">
-                <v-btn depressed elevation="0" large class="px-3 py-1 mx-2 no-uppercase" @click="parseText">Evaluate</v-btn>
-                <v-btn depressed elevation="0" large class="px-3 py-1 mx-2 no-uppercase" @click="previewTask">Preview</v-btn>
-                <v-btn elevation="2" large color="primary"
-                    class="px-6 py-2 mx-2 no-uppercase" @click="getCategories(); overlaySave = true"> Save
-                </v-btn>
-                <!-- <v-btn class="mx-1" @click="restoreText">Restore</v-btn> -->
-            </div>
-
+                <div class="d-flex mt-2 justify-self-end justify-end">
+                    <v-spacer></v-spacer>
+                    <!-- <v-btn depressed elevation="0" large class="px-3 py-1 mx-2 no-uppercase" @click="parseText">Evaluate</v-btn> -->
+                    <v-btn depressed elevation="0" large class="px-3 py-1 mx-2 no-uppercase" @click="previewTask">Preview</v-btn>
+                    <v-btn elevation="2" large color="primary"
+                        class="px-6 py-2 ml-2 no-uppercase" @click="openSaveDialog()"> Save
+                    </v-btn>
+                    <!-- <v-btn class="mx-1" @click="restoreText">Restore</v-btn> -->
+                </div>
             </v-col>
+            
         </v-container>
+        
 
-        <!-- Make this a dialog...variable dialog -->
+        <!-- Variable config dialog -->
         <v-overlay tabindex="0" @keydown.esc="overlayV = false"
             :value="overlayV" :light="true" :dark="false" v-if="ext_text.task.variables.length != 0">
             <v-sheet 
                 elevation="4" width="500" 
                 class="pa-4 ma-2 mt-0 pt-2 d-flex flex-column justify-flex-start align-flex-start rounded-lg">
-                <v-form v-model="variableOk">
+                <v-form ref="vForm" v-model="variableOk">
                 
                 <div v-if="variable.added" class="ma-2 mt-3 d-flex justify-space-between">
                     <v-text-field :rules="[v => (v.trim().length != 0) || 'Name must have atleast 1 character', v => (/^[0-9a-zA-Z_]+$/.test(v)) || 'Name must contain only letters, numbers and underscores']" outlined label="Name" dense v-model="variable.name"></v-text-field>
@@ -150,9 +240,8 @@
                 
                 <p class="ma-2"> Definition </p>
                 <v-text-field 
-                    label="" placeholder="E.g.: ( $a * 2 ) + 1" 
-                    
-                    v-model="variable.definiton"
+                    label="" placeholder="E.g.: ( $a * 2 ) + 1"
+                    v-model="variable.definition"
                     outlined dense class="shrink mx-2"> 
                     {{ variable.definition }} 
                 </v-text-field>
@@ -160,14 +249,17 @@
                 <p class="ma-2 mt-0"> Range {{ variable.range.fullRange() }} </p>
                 <v-row class="d-flex flex-row flex-nowrap px-3">
                     <v-text-field 
+                        :rules="rangeRules"
                         label="Start" v-model="variable.range.start" 
                         outlined dense class="shrink mx-2 mt-3">
                     </v-text-field>
-                    <v-text-field 
+                    <v-text-field
+                        :rules="rangeRules"
                         label="End" v-model="variable.range.end" 
                         outlined dense class="shrink mx-2 mt-3">
                     </v-text-field>
                     <v-text-field 
+                        :rules="rangeRules"
                         label="Step" v-model="variable.range.step"
                         outlined dense class="shrink mx-2 mt-3">
                     </v-text-field>
@@ -181,7 +273,7 @@
                                 <v-icon>mdi-delete-empty</v-icon>
                             </v-btn>
                         </template>
-                        <span>Delete variable</span>
+                        <span>Delete Variable</span>
                     </v-tooltip>
                     
                     <v-spacer></v-spacer>
@@ -206,7 +298,7 @@
                 </v-btn>
             </h2>
 
-            <p class="ma-2 mt-0"> Range {{ answer.range.fullRange() }} </p>
+            <!-- <p class="ma-2 mt-0"> Range {{ answer.range.fullRange() }} </p>
             <v-row class="d-flex flex-row flex-nowrap px-3 shrink">
                 <v-text-field 
                     label="Start" v-model="answer.range.start" 
@@ -216,24 +308,23 @@
                     label="End" v-model="answer.range.end" 
                     outlined dense class="shrink mx-2 mt-3">
                 </v-text-field>
-            </v-row>
+            </v-row> -->
 
             <p class="ma-2 mt-0">Correct</p>
             <div 
                 class="d-flex flex-row" 
                 v-for="(el, i) in answer.correct" :key="'el_c' + i">
-                <v-text-field 
-                    label="" 
+                <v-text-field
+                    label=""
                     placeholder="E.g.: ( $a * 2 ) + 1" 
                     v-model="answer.correct[i]"
-                    outlined dense class="mx-2 my-0"> 
+                    outlined dense color="primary"
+                    class="mx-2 my-0 d-flex flex-grow-1">
                     {{ el }}
+                    <template v-slot:append>
+                        <v-icon @click="removeCorrect(i)" color="error">mdi-delete-empty</v-icon>
+                    </template>
                 </v-text-field>
-                <v-btn
-                    @click="removeCorrect(i)" 
-                    icon plain color="red" class="mx-2">
-                    <v-icon>mdi-delete-empty</v-icon>
-                </v-btn>
             </div>
             <v-btn depressed class="mx-2" @click="addCorrect">
                 <v-icon>mdi-plus</v-icon>
@@ -245,18 +336,17 @@
             <div 
                 class="d-flex flex-row" 
                 v-for="(el, i) in answer.incorrect" :key="'el_ic' + i">
-                <v-text-field 
-                    label="" 
+                <v-text-field
+                    label=""
                     placeholder="E.g.: ( $a * 2 ) + 1" 
-                    v-model="answer.incorrect[i]" 
-                    outlined dense class="mx-2 my-0"> 
+                    v-model="answer.incorrect[i]"
+                    outlined dense color="primary"
+                    class="mx-2 my-0 d-flex flex-grow-1">
                     {{ answer.incorrect }}
+                    <template v-slot:append>
+                        <v-icon @click="removeIncorrect(i)" color="error">mdi-delete-empty</v-icon>
+                    </template>
                 </v-text-field>
-                <v-btn 
-                    @click="removeIncorrect(i)"
-                    icon plain color="red" class="mx-2">
-                    <v-icon>mdi-delete-empty</v-icon>
-                </v-btn>
             </div>
             <v-btn depressed class="mx-2" @click="addIncorrect()">
                 <v-icon>mdi-plus</v-icon>
@@ -271,7 +361,7 @@
                             <v-icon>mdi-delete-empty</v-icon>
                         </v-btn>
                     </template>
-                    <span>Delete answer</span>
+                    <span>Delete Answer</span>
                 </v-tooltip>
                 <v-spacer></v-spacer>
                 <v-btn color="black" class="mx-2 my-4 mt-6 no-uppercase" outlined text @click="overlayA= false"> Cancel </v-btn>
@@ -281,7 +371,7 @@
             </v-sheet>
         </v-overlay>
 
-        <!-- Answer type options dialog -->
+        <!-- Save dailog -->
         <v-dialog v-model="overlaySave" width="450" :retain-focus="false">
             <v-card class="d-flex flex-column rounded-lg pt-2">
                 <p class="pb-4 my-2 font-weight-bold text-h5 align-self-center"> Task details</p>
@@ -300,7 +390,7 @@
                 <v-combobox class="px-4" label="Categories" v-model="selectedTaskCategories" 
                     :items="taskCategories" multiple chips outlined>
                     <template v-slot:selection="data">
-                        <v-chip color="primary" class="pa-2" v-bind="data.attrs">
+                        <v-chip close @click:close="removeCategoryFromList(data.item)" color="primary" class="pa-2" v-bind="data.attrs">
                         {{ data.item }}
                         </v-chip>
                     </template>
@@ -319,7 +409,7 @@
 
         <!-- Task creation explanation dialog -->
         <v-dialog v-model="helpDialog" width="80vw" :retain-focus="false">
-            <v-card class="d-flex flex-column rounded-lg pt-2">
+            <v-card class="d-flex flex-column pt-2">
                 <v-card-title class="text-h5 d-flex justify-space-between"> 
                     How to write tasks? 
                     <v-btn plain icon @click="helpDialog = false" class="pa-0 mr-n2 shrink">
@@ -338,7 +428,7 @@
                                 It can contain any amount of characters (including zero) and <span class="font-weight-bold">Variables</span>. <br>
                             </v-card-text>
                             <v-textarea readonly text-narrow spellcheck="false" background-color="white" color="black"
-                                placeholder="Jamie has a big house and a barn. In his barn he has $x horses and $y cows. He sells two cows and one horse.'"
+                                value="Jamie has a big house and a barn. In his barn he has $x horses and $y cows. He sells two cows and one horse.'"
                                 class="text-h3 pb-2 mx-4" solo no-resize hide-details rows="4">
                             </v-textarea>
                         </v-col>
@@ -350,9 +440,11 @@
                                 A task can have an unlimited number of questions. <br>
                                 Questions can contain any amount of characters, 
                                 <span class="font-weight-bold">Variables</span> and 
-                                <span class="font-weight-bold">must contain one or more Answers</span>. <br>
+                                <span class="font-weight-bold">  <span class="text-underline"> must </span>
+                                    contain one or more Answers
+                                </span>. <br>
                                 <v-text-field readonly
-                                    placeholder="How many horses does Jamie have? @horses"
+                                    value="How many horses does Jamie have? @horses"
                                     solo hide-details color="error"
                                     class="my-1 d-flex flex-grow-1">
                                     <template v-slot:append>
@@ -361,7 +453,14 @@
                                 </v-text-field>
                             </v-card-text>
                         </v-col>
+    
                         <v-col cols="12" class="py-0 my-0">
+                            <!-- <v-card-text> 
+                                After defining the task text and questions hit the 
+                                <v-btn depressed large elevation="2" class="px-3 py-1 mx-2 no-uppercase"> Evaluate </v-btn>
+                                button to automatically add variables and answers found in these texts. <br>
+                                <span style="font-style: italic"> Evaluation also check your texts for any errors or invalid characters. </span>
+                            </v-card-text> -->
                             <v-card-text>
                                 <span class="text-underline text-body-1">3. Variables </span>  <br>
                                 After writing down your questions it's time to define Variables.
@@ -393,23 +492,23 @@
                                     </h2>
                                     
                                     <p class="ma-2"> Definition </p>
-                                    <v-text-field 
-                                        label="" placeholder="E.g.: ( $x * 2 ) + 1" 
+                                    <v-text-field readonly
+                                        label="" value="E.g.: ( $x * 2 ) + 1" 
                                         outlined dense class="shrink mx-2"> 
                                     </v-text-field>
                                     
                                     <p class="ma-2 mt-0"> Range </p>
                                     <v-row class="d-flex flex-row flex-nowrap px-3">
                                         <v-text-field readonly
-                                            label="Start" placeholder="1"
+                                            label="Start" value="1"
                                             outlined dense class="shrink mx-2 mt-3">
                                         </v-text-field>
                                         <v-text-field readonly
-                                            label="End" placeholder="100"
+                                            label="End" value="10"
                                             outlined dense class="shrink mx-2 mt-3">
                                         </v-text-field>
                                         <v-text-field readonly
-                                            label="Step" placeholder="E.g.: 100, 1, 0.1"
+                                            label="Step" value="1"
                                             outlined dense class="shrink mx-2 mt-3">
                                         </v-text-field>
                                     </v-row>
@@ -418,7 +517,7 @@
                                 <v-col cols="6">
                                     <span class="font-weight-bold text-underline">Definition</span> - a predefined value or expression to be calculated. <br>
                                 Expressions can contain other Variables.<br>  
-                                Example: We have a variable named $x, if we set its definiton to: <br>
+                                Example: We have a variable named $x, if we set its definition to: <br>
                                 <ul>
                                     <li>"2" - each occurrence of $x in a text will be replaced by the value "2" </li>
                                     <li>"$y + 2" - each occurrence of $x in a text will be replaced by the value which will be 
@@ -454,9 +553,9 @@
 
                                 <v-row>
                                 <v-col cols="6">
-                                    <span class="font-weight-bold text-underline">Range</span> - defines the limits of the generated correct answer. <br>
+                                <!-- <span class="font-weight-bold text-underline">Range</span> - defines the limits of the generated correct answer. <br>
                                 All generated correct answers must confine into the defined limits.
-                                When left empty, no restrictions will apply to the generated answers.<br><br>
+                                When left empty, no restrictions will apply to the generated answers.<br><br> -->
 
                                 <span class="font-weight-bold text-underline">Correct</span><br>
                                 In this section you define the value or expression that represents the correct answer or answers.
@@ -475,8 +574,6 @@
                                 Task 'Example2 - Static' demonstrates such a task.
                                 </span>
 
-
-                                
                                 </v-col>
                                 <v-col cols="6" class="d-flex justify-center align-center">
                                 <v-sheet elevation="3" width="500" height="500px"
@@ -485,7 +582,7 @@
                                         Answer name
                                     </h2>
 
-                                    <p class="ma-2 mt-0"> Range </p>
+                                    <!-- <p class="ma-2 mt-0"> Range </p>
                                     <v-row class="d-flex flex-row flex-nowrap px-3 shrink">
                                         <v-text-field readonly 
                                             label="Start" placeholder="10"
@@ -495,32 +592,36 @@
                                             label="End" placeholder="100"
                                             outlined dense class="shrink mx-2 mt-3">
                                         </v-text-field>
-                                    </v-row>
+                                    </v-row> -->
 
                                     <p class="ma-2 mt-0">Correct</p>
                                     <div class="d-flex flex-row">
-                                        <v-text-field 
-                                            label="" placeholder="$x - 1" outlined dense class="mx-2 my-0"> 
+                                        <v-text-field
+                                            value="$x - 1" readonly
+                                            outlined dense color="primary"
+                                            class="mx-2 my-0 d-flex flex-grow-1">
+                                            <template v-slot:append>
+                                                <v-icon color="error">mdi-delete-empty</v-icon>
+                                            </template>
                                         </v-text-field>
-                                        <v-btn icon plain color="red" class="mx-2"><v-icon>mdi-delete-empty</v-icon></v-btn>
                                     </div>
                                     <v-btn depressed class="mx-2">
-                                        <v-icon>mdi-plus</v-icon>Add correct answer
+                                        <v-icon>mdi-plus</v-icon> 
+                                        Add correct answer
                                     </v-btn>
-
                                     
                                     <p class="ma-2">Incorrect</p>
                                     <div 
                                         class="d-flex flex-row" 
                                         v-for="(el, i) in ['$x - 2', 'E.g.: $x + 2, Pythagoras']" :key="'el_ic' + i">
-                                        <v-text-field 
-                                            label="" readonly
-                                            :placeholder="el"
-                                            outlined dense class="mx-2 my-0">
+                                        <v-text-field
+                                            :value="el" readonly
+                                            outlined dense color="primary"
+                                            class="mx-2 my-0 d-flex flex-grow-1">
+                                            <template v-slot:append>
+                                                <v-icon color="error">mdi-delete-empty</v-icon>
+                                            </template>
                                         </v-text-field>
-                                        <v-btn icon plain color="red" class="mx-2">
-                                            <v-icon>mdi-delete-empty</v-icon>
-                                        </v-btn>
                                     </div>
                                     <v-btn depressed class="mx-2" @click="addIncorrect">
                                         <v-icon>mdi-plus</v-icon> Add incorrect answer
@@ -528,6 +629,12 @@
                                     
                                     </v-sheet>
                                 </v-col>
+                                    <v-card-text> 
+                                        To check how your task looks like hit the
+                                        <v-btn depressed large elevation="2" class="px-3 py-1 mx-2 no-uppercase"> Preview </v-btn>
+                                        button. <br>
+                                        <span style="font-style: italic"> Preview shows a rough look which you can change while configuring each task at test creation. </span>
+                                    </v-card-text>
                                 </v-row>
                             </v-card-text>
                         </v-col>
@@ -550,7 +657,7 @@
     import { Extractor } from "../myfiles/extractorModule";
 
     import MathJax, { initMathJax, renderByMathjax } from "mathjax-vue";
-    import { cloneDeep } from 'lodash';
+    import { cloneDeep, debounce } from 'lodash';
 
     import TaskDataService from "../services/taskDataService";
     import GeneratorService from "../services/generatorService";
@@ -592,10 +699,30 @@
                 indexV: 0,
                 indexAV: 0,
                 indexA: 0,
+
+                questionRules: [
+                    v => v.length != 0 || "Question cannot be empty",
+                    v => /^.*@[a-zA-Z0-9]+.*$/.test(v) || "Question must contain an Answer"
+                ],
+                rangeRules: [
+                    v => /^[0-9.]*$/.test(v) || "Numbers only"
+                ],
+
+                selectedPreviewRenderOption: 'radio',
+                previewRenderOptions: ['text', 'select', 'radio', 'checkbox'],
             };
         },
         computed: {
-            getText() { return this.text; }
+            getText() { return this.text; },
+
+            autoParseText() { return debounce(this.parseText, 1000) },
+        },
+
+        // Save route we came from
+        beforeRouteEnter (to, from, next) {
+            console.log("CAME FROM: ", from.name);
+            localStorage.setItem('prevRoute', from.name);
+            next();
         },
 
         // Load task depending on navigation origin
@@ -637,7 +764,7 @@
                         this.text = this.ext_text.task.text.trim();
                     })
                     .catch((error) => { 
-                        this.errorHandler(error); 
+                        console.log(error); 
                     });
             }
 
@@ -647,11 +774,20 @@
             })
         },
 
-        mounted() { },
-
-        created() { },
-
         methods: {
+
+            removeCategoryFromList(categoryToDelete) {
+                console.log("REMOVE?", categoryToDelete);
+                let deleteAtIndex = this.selectedTaskCategories.findIndex(
+                    (category) => category == categoryToDelete);
+                this.selectedTaskCategories.splice(deleteAtIndex, 1);
+            },
+
+            openSaveDialog() {
+                this.parseText();
+                this.getCategories();
+                this.overlaySave = true;
+            },
 
             getCategories() {
                 CategoryDataService.getAll().then(({data}) => {
@@ -685,24 +821,49 @@
 
                 // Create new entry in database
                 if ( localStorage.getItem('taskId') == null) {
+
+                    this.loading = true;
                     
                     try{
                         let newTask = await TaskDataService.create(data);
 
-                        localStorage.setItem('taskId', newTask.data.id);
+                        let taskId = newTask.data.id; 
+                        localStorage.setItem('taskId', taskId);
 
                         console.log(this.selectedTaskCategories);
 
+                        // Add each selectedCategory to task
                         for(let selectedCategory of this.selectedTaskCategories) {
-                            let category = await CategoryDataService.find({name: selectedCategory});
 
-                            // check
+                            try {
+                                // Find category id in DB
+                                let category = await CategoryDataService.find({name: selectedCategory}); 
+                                
+                                // Add category to task
+                                await TaskDataService.addCategory(
+                                    { taskId: taskId, categoryId: category.data.id }
+                                )
+                            } catch(error) {
+
+                                console.log("ADDING CATEGORY");
+
+                                // Create category
+                                let category = await CategoryDataService.create({name: selectedCategory});
+                                
+                                // Add category to task
+                                await TaskDataService.addCategory(
+                                    { taskId: taskId, categoryId: category.data.id }
+                                )
+
+                                console.log("Added");
+                            }
                         }
 
                         this.$store.dispatch('showMessage', { message: "Task saved successfuly" });
                     } catch(error) {
                         // log
                         this.$store.dispatch('showMessage', { message: error.response.data.message, success: false });
+                        this.loading = false;
                     }
                     }
 
@@ -712,14 +873,17 @@
                     let taskId = localStorage.getItem('taskId');
                     let task = await TaskDataService.get(taskId);
 
+                    this.loading = true;
+
                     try{
                         // Delete each category on the task
                         for(let category of task.data.categories) {
                             TaskDataService.removeCategory({ taskId: taskId, categoryId: category.id });
                         }
                     } catch(error) {
-                        //
+                        // Handle error
                         console.log("Error while deleting categories from task");
+                        this.loading = false;
                     }
 
                     // Add each selectedCategory to task
@@ -734,6 +898,8 @@
                                 { taskId: taskId, categoryId: category.data.id }
                             )
                         } catch(error) {
+
+                            console.log("ADDING CATEGORY");
 
                             // Create category
                             let category = await CategoryDataService.create({name: selectedCategory});
@@ -751,10 +917,21 @@
                     TaskDataService.update( localStorage.getItem('taskId'), data ) 
                         .then((res) => {
                             console.log(res);
-                            this.$router.push({name: "yourTasks"});
-                            this.$store.dispatch('showMessage', { message: res.data.message });
+                            console.log("SAVED: ", localStorage.getItem('prevRoute'));
+                            if (localStorage.getItem('prevRoute') == 'createTest') {
+                                this.$router.push({name: "createTest"});        
+                                this.$store.dispatch('showMessage', { message: res.data.message });
+                                this.loading = false;
+                            }
+                            else {    
+                                this.localStorage.setItem('prevRoute', null);
+                                this.$router.push({name: "yourTasks"});
+                                this.$store.dispatch('showMessage', { message: res.data.message });
+                                this.loading = false;
+                            }
                         })
                         .catch((err) => {
+                            this.loading = false;
                             this.$store.dispatch('showMessage', { message: err.response.data.message, success: false });
                         })
                 }
@@ -771,6 +948,8 @@
             },
             // close and save edited values
             setVariableInfo: function() {
+                if(this.$refs.vForm.validate() == false) return;    
+
                 if(this.variable.added) {
                     this.variable.name = '$'.concat(this.variable.name);
                 }
@@ -856,6 +1035,10 @@
 
             parseText : function () {
 
+                console.log("PARSING...");
+
+                if(this.$refs.qForm.validate() == false) return false;
+
                 // TEXT
                 this.ext_text.task.text = this.text;
 
@@ -916,6 +1099,10 @@
         position: absolute !important;
         top: 0rem !important;
         right: 0rem !important;
+    }
+
+    .task-bg {
+        min-height: 92.5%;
     }
 
 </style>

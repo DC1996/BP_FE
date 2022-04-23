@@ -217,6 +217,8 @@ export default {
 
     // Populate the concreteTasks array with generated abstractTasks
     generateConcreteTasks(context) {
+      console.log("GENERATING...");
+
       generatorService
         .generateMultiple({
           abstractTasks: context.state.selectedTasks,
@@ -271,7 +273,7 @@ export default {
 
     // Load task from database by category
     async getTasks(context) {
-      console.log("Categories selected", context.state.selectedTaskCategories);
+      console.log("DOWNLOADING TASKS");
 
       taskDataService
         .findAllMatching({
@@ -281,6 +283,8 @@ export default {
           ),
         })
         .then((response) => {
+          console.log(response.data);
+
           let payload = {
             // Map task properties
             tasks: response.data.map((task) => {
@@ -292,7 +296,15 @@ export default {
               };
             }),
           };
+
           context.commit("GET_TASKS", payload);
+
+          for (let task of payload.tasks) {
+            context.dispatch("setSelectedTask", { task });
+            context.dispatch("setSelectedTask", { task });
+          }
+
+          context.dispatch("generateConcreteTasks");
         });
     },
   },

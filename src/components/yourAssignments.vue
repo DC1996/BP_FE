@@ -21,6 +21,8 @@
             :headers="headers"
             :items="assignments"
             :items-per-page="7"
+            :loading="loading"
+            loading-text="Loading assignments... Please wait"
             :search="search"
             width="80%"
         >
@@ -72,7 +74,7 @@
 
         </v-card>
 
-        <v-dialog v-model="startDialog" width="325">
+        <v-dialog v-model="startDialog" width="450">
             <v-card>
                 <v-card-title class="text-h5 lighten-2"> Start task </v-card-title>
 
@@ -80,16 +82,23 @@
                     <span class="font-weight-medium text-body-1">
                         {{ selectedTest.timeLimit }} minutes
                     </span> 
-                    to complete this test. Do not close the browser window during 
-                    the test or you will lose your data and will need to start over. 
+                    to complete this test. <br> 
+                    Use the 
+                    <span class="font-weight-medium">
+                        Save Answers
+                    </span> 
+                    button to make sure your answers are saved before your time runs out. 
+                    Click <span class="font-weight-medium">
+                        Finish Test
+                    </span> when you are absolutely sure of your answers. Good Luck!
                 </v-card-text>
 
                 <v-divider></v-divider>
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="black" outlined text @click="startDialog = false"> Cancel </v-btn>
-                    <v-btn color="primary" @click="startTest(selectedTest.id)"> Start </v-btn>
+                    <v-btn color="black" class="no-uppercase" outlined text @click="startDialog = false"> Cancel </v-btn>
+                    <v-btn color="primary" class="no-uppercase" @click="startTest(selectedTest.id)"> Start </v-btn>
                 </v-card-actions>
                 
             </v-card>
@@ -108,7 +117,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" outlined text @click="resultsDialog = false"> Close </v-btn>
+                    <v-btn color="primary" class="no-uppercase" outlined text @click="resultsDialog = false"> Close </v-btn>
                 </v-card-actions>
                 
             </v-card>
@@ -138,7 +147,9 @@ import userDataService from '../services/userDataService';
                     {text: "Time limit", value: "time_limit", width: "25ch"},
                     {text: "Action", value: "action", align: "center", sortable: false, width: "10ch"},
                 ],
-                assignments: [ ]
+                assignments: [ ],
+
+                loading: false,
             };
         },
 
@@ -219,6 +230,9 @@ import userDataService from '../services/userDataService';
             },
             // Get tasks from database
             retrieveTasks() {
+
+                this.loading = true;
+
                 userDataService.getStudentAssignments(this.$store.state.app.userID).then(({data}) => {    
 
                     console.log("CONTENT: ", data);
@@ -233,6 +247,9 @@ import userDataService from '../services/userDataService';
                             content: test.content
                         }
                     });
+
+                    this.loading = false;
+
                 });
             },
 

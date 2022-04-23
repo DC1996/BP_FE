@@ -462,17 +462,15 @@ export function parseMathLang(text) {
   function skipNewLines() {
     while (
       i < tokens.length &&
-      ( checkTokenType(Token.types.whitespace.newline) || checkTokenType(Token.types.whitespace.space) )
+      (checkTokenType(Token.types.whitespace.newline) ||
+        checkTokenType(Token.types.whitespace.space))
     ) {
       i++;
     }
   }
 
   function skipSpaces() {
-    while (
-      i < tokens.length &&
-      checkTokenType(Token.types.whitespace.space)
-    ) {
+    while (i < tokens.length && checkTokenType(Token.types.whitespace.space)) {
       i++;
     }
   }
