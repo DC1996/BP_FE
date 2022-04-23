@@ -124,7 +124,7 @@
       <!-- See preview of each task, modify render options -->
       <v-stepper-content step="4">
         <v-container class="d-flex flex-column">
-          <p class="text-h4 align-self-center" @blur="setTestName($event)" contenteditable="true"> 
+          <p class="text-h4 align-self-center"> 
             {{ $store.state.test.name }} 
           </p>
 
@@ -325,7 +325,7 @@
                 <!-- Set task name -->
                 <v-text-field 
                     class="px-4" v-model="testName" outlined hide-details="auto"
-                    label="Test name" :rules="testNameRule" placeholder="Enter test name" @change="setTestName">
+                    label="Test name" :rules="testNameRule" placeholder="Enter test name">
                 </v-text-field>
 
                 <v-container class="d-flex flex-row pa-0 py-2 my-3 mx-0">
@@ -434,6 +434,8 @@ export default {
         createOrSaveTest() {
 
           this.loading = true;
+
+          this.setTestName();
 
           try{
 
