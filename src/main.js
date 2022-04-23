@@ -89,7 +89,6 @@ Vue.mixin({
 
 // Router instance
 const router = new VueRouter({
-  mode: "history",
   // Define web app routes
   routes: [
     { path: "/", name: "home", component: homepageVue },
