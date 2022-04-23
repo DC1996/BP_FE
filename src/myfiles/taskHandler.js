@@ -30,6 +30,7 @@ export class Answer {
     this.range = new Range();
 
     this.visible = true;
+    this.hasError = false;
   }
 }
 
@@ -42,6 +43,8 @@ export class Variable {
 
     this.visible = true;
     this.added = false;
+
+    this.hasError = false;
   }
 }
 

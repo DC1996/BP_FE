@@ -29,10 +29,14 @@
             <h3 class="ml-2 mb-1"> Variables </h3>          
                 <div class="d-flex flex-row flex-wrap align-center ma-0 pa-0 minus">
                     <div v-for="(variable, ind) in ext_text.task.variables" :key="ind + 'v'" class="ma-0 pa-0">
-                        <v-chip v-if="variable.visible" @click="variableInfo(ind)"
-                            color="primary" label class="mx-2 my-1 px-6 py-4 pointer elevation-1">
-                            {{ variable.name.substr(1) }}
-                        </v-chip>
+                        <div class="mx-2 my-1">
+                            <v-badge :value="variable.hasErrors" color="error" icon="mdi-exclamation" overlap>
+                                <v-chip v-if="variable.visible" @click="variableInfo(ind)"
+                                    color="primary" label class="px-6 py-4 pointer elevation-1">
+                                    {{ variable.name.substr(1) }}
+                                </v-chip>
+                            </v-badge>
+                        </div>
                     </div>                    
                     
                     <!-- Add variable button -->
@@ -52,11 +56,13 @@
                             v-if="ext_text.task.answers.length == 0" >
                             No Answers found. Add Answers to questions.
                         </p>
-                        <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="ma-0 pa-0">
-                            <v-chip v-if="answer.visible" @click="answerInfo(i)"
-                                color="primary" label class="mx-2 my-1 px-6 py-4 pointer">
-                                {{ answer.name.substr(1) }}
-                            </v-chip>
+                        <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="mx-2 my-1 pa-0">
+                            <v-badge :value="answer.hasErrors" color="error" icon="mdi-exclamation" overlap>
+                                <v-chip v-if="answer.visible" @click="answerInfo(i)"
+                                    color="primary" label class="px-6 py-4 pointer">
+                                    {{ answer.name.substr(1) }}
+                                </v-chip>
+                            </v-badge>
                         </div>
                     </div>
             </div>
@@ -326,7 +332,7 @@
                     </template>
                 </v-text-field>
             </div>
-            <v-btn depressed class="mx-2" @click="addCorrect">
+            <v-btn depressed class="mx-2 no-uppercase" @click="addCorrect">
                 <v-icon>mdi-plus</v-icon>
                 Add correct answer
             </v-btn>
@@ -348,7 +354,7 @@
                     </template>
                 </v-text-field>
             </div>
-            <v-btn depressed class="mx-2" @click="addIncorrect()">
+            <v-btn depressed class="mx-2 no-uppercase" @click="addIncorrect()">
                 <v-icon>mdi-plus</v-icon>
                 Add incorrect answer
             </v-btn>
@@ -365,7 +371,7 @@
                 </v-tooltip>
                 <v-spacer></v-spacer>
                 <v-btn color="black" class="mx-2 my-4 mt-6 no-uppercase" outlined text @click="overlayA= false"> Cancel </v-btn>
-                <v-btn dark color="primary" class="mx-1 my-4 mt-6 no-uppercase" @click="setAnswerInfo()"> Save </v-btn>
+                <v-btn color="primary" class="mx-1 my-4 mt-6 no-uppercase" @click="setAnswerInfo()"> Save </v-btn>
             </v-row>
 
             </v-sheet>
@@ -400,8 +406,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="black" outlined text @click="overlaySave= false"> Cancel </v-btn>
-                    <v-btn dark color="primary" @click="saveText(); overlaySave = false"> Save </v-btn>
+                    <v-btn class="no-uppercase" color="black" outlined text @click="overlaySave = false"> Cancel </v-btn>
+                    <v-btn class="no-uppercase" color="primary" @click="saveText()"> Save </v-btn>
                 </v-card-actions>
                 
             </v-card>
@@ -413,8 +419,8 @@
                 <v-card-title class="text-h5 d-flex justify-space-between"> 
                     How to write tasks? 
                     <v-btn plain icon @click="helpDialog = false" class="pa-0 mr-n2 shrink">
-                    <v-icon color="danger">mdi-close</v-icon>
-                </v-btn>
+                        <v-icon color="danger">mdi-close</v-icon>
+                    </v-btn>
                 </v-card-title>
                 <v-card-text> Task creation can be divided into four parts. Each part is explained below and can be observed in the example tasks. <br>
                 The example tasks can be found in the <span class="font-weight-bold">Your tasks</span> page.</v-card-text>
@@ -605,7 +611,7 @@
                                             </template>
                                         </v-text-field>
                                     </div>
-                                    <v-btn depressed class="mx-2">
+                                    <v-btn depressed class="mx-2 no-uppercase">
                                         <v-icon>mdi-plus</v-icon> 
                                         Add correct answer
                                     </v-btn>
@@ -623,7 +629,7 @@
                                             </template>
                                         </v-text-field>
                                     </div>
-                                    <v-btn depressed class="mx-2" @click="addIncorrect">
+                                    <v-btn depressed class="mx-2 no-uppercase" @click="addIncorrect">
                                         <v-icon>mdi-plus</v-icon> Add incorrect answer
                                     </v-btn>
                                     
@@ -784,9 +790,13 @@
             },
 
             openSaveDialog() {
-                this.parseText();
                 this.getCategories();
-                this.overlaySave = true;
+                if( this.parseText() ) {
+                    this.overlaySave = true;
+                }
+                else {
+                    this.overlaySave = false;
+                }
             },
 
             getCategories() {
@@ -860,6 +870,9 @@
                         }
 
                         this.$store.dispatch('showMessage', { message: "Task saved successfuly" });
+                        this.$router.push({name: "yourTasks"});
+                        this.overlaySave = false
+                        this.loading = false;
                     } catch(error) {
                         // log
                         this.$store.dispatch('showMessage', { message: error.response.data.message, success: false });
@@ -921,12 +934,14 @@
                             if (localStorage.getItem('prevRoute') == 'createTest') {
                                 this.$router.push({name: "createTest"});        
                                 this.$store.dispatch('showMessage', { message: res.data.message });
+                                this.overlaySave = false
                                 this.loading = false;
                             }
                             else {    
                                 this.localStorage.setItem('prevRoute', null);
                                 this.$router.push({name: "yourTasks"});
                                 this.$store.dispatch('showMessage', { message: res.data.message });
+                                this.overlaySave = false
                                 this.loading = false;
                             }
                         })
@@ -955,6 +970,8 @@
                 }
                 this.ext_text.task.variables[this.indexV] = cloneDeep(this.variable);
                 this.overlayV = false;
+
+                this.parseText();
             },
             // opens answers setting dialog
             answerInfo: function(i) {
@@ -966,6 +983,8 @@
             setAnswerInfo: function() {
                 this.ext_text.task.answers[this.indexA] = cloneDeep(this.answer);
                 this.overlayA = false;
+
+                this.parseText();
             },
             // opens preview task dialog
             previewTask: function () {
@@ -1035,16 +1054,12 @@
 
             parseText : function () {
 
-                console.log("PARSING...");
-
                 if(this.$refs.qForm.validate() == false) return false;
 
                 // TEXT
                 this.ext_text.task.text = this.text;
 
                 let tokens = tokenize(this.text);
-
-                console.log("TOKENS: ",tokens);
 
                 // ANSWERS
                 this.answers = this.ext_text.extractAnswers(tokens);
@@ -1056,15 +1071,16 @@
                 this.ext_text.task.answers.forEach((answer) => {
                     answer.visible = false;
                 });
+
                 // QUESTIONS
                 this.ext_text.task.questions.forEach((question) => {
-
-                    //console.log('Q',question);
-                    //console.log(tokenize("Q: ", question.text));
-
+                    // Tokenize questions
                     let questionTokens = tokenize(question.text);
-
+                    
+                    // Find answers in question text
                     this.ext_text.extractAnswers(questionTokens);
+
+                    // Build tokens together
                     tokens = tokens.concat(questionTokens);
                 });
 
@@ -1073,6 +1089,66 @@
                 // VARIABLES
                 this.variables = this.ext_text.extractVariables(tokens);
 
+                // Check for empty definitions in variables
+                let hasErrors = false;
+                for(let variable of this.variables) {
+                    // Optimistically set error status to false
+                    variable.hasErrors = false;
+                    if(
+                        variable.definition == '' && 
+                        variable.range.start == '' && 
+                        variable.range.end == '' && 
+                        variable.range.step == '') {
+                            this.$store.dispatch('showMessage', {message: `Variable ${variable.name} has empty definition or range`, success: false});
+                            variable.hasErrors = true;
+                            hasErrors = true;
+                        }
+
+                    if(variable.definition == '' && 
+                        (variable.range.start == '' ||
+                        variable.range.end == '' || 
+                        variable.range.step == '')
+                    ) {
+                        this.$store.dispatch('showMessage', {message: `Variable ${variable.name} is missing range values (start, end or option)`, success: false});
+                        variable.hasErrors = true;
+                        hasErrors = true;
+                    }
+                }
+
+                // Check for errors in answers
+                for(let answer of this.answers) {
+                    answer.hasErrors = false;
+
+                    if(answer.correct.length == 0) {
+                        this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has no correct option`, success: false});
+                        answer.hasErrors = true;
+                        hasErrors = true;
+                    }
+
+                    // Check if answer options are empty
+                    if(answer.correct.length != 0) {
+                        for(let option of answer.incorrect) {
+                            if(option.trim() == '') {
+                                this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has an empty correct definition`, success: false});
+                                answer.hasErrors = true;
+                                hasErrors = true;
+                            }
+                        }
+                    }
+                    if(answer.incorrect.length != 0) {
+                        for(let option of answer.incorrect) {
+                            if(option.trim() == '') {
+                                this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has an empty incorrect definition`, success: false});
+                                answer.hasErrors = true;
+                                hasErrors = true;
+                            }
+                        }
+                    }
+                }
+
+                // Check for errors
+                if(hasErrors) return false;
+
                 try{
                     let generated_text = this.ext_text.generateText();
                     this.$store.dispatch('showMessage', {message: "Successfuly evaluated!"});
@@ -1080,6 +1156,8 @@
                 } catch(err) {
                     this.$store.dispatch('showMessage', {message: err.message, success: false});
                 }
+
+                return true;
             }     
         }
     }
