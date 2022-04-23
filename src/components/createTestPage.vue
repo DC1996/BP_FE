@@ -415,7 +415,7 @@ export default {
           setName: 'test/setName',
           setGrade: 'test/setGrade',
           setTimeLimit: 'test/setTimeLimit',
-          setTestname: 'test/setTestName',
+          setTestName: 'test/setTestName',
           setSelectedCategory: 'test/setSelectedCategory',
           setSelectedTask: 'test/setSelectedTask',
           moveToNextStep: 'test/moveToNextStep',
