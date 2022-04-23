@@ -197,7 +197,7 @@ export default {
             .catch((err) => {
                 console.log("Error:", err);
                 this.loading = false;
-                this.$store.dispatch('showMessage',{message: "Sorry, something went wrong!", success: false});
+                this.$store.dispatch('showMessage',{message: err.response.data.message, success: false});
             })
         }
     }
