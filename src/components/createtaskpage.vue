@@ -716,6 +716,8 @@
 
                 selectedPreviewRenderOption: 'radio',
                 previewRenderOptions: ['text', 'select', 'radio', 'checkbox'],
+
+                loading: false,
             };
         },
         computed: {
@@ -768,6 +770,8 @@
                         // this.ext_text.task = parseMathLang(res.data.content);
 
                         this.text = this.ext_text.task.text.trim();
+
+                        this.parseText();
                     })
                     .catch((error) => { 
                         console.log(error); 
@@ -938,7 +942,7 @@
                                 this.loading = false;
                             }
                             else {    
-                                this.localStorage.setItem('prevRoute', null);
+                                localStorage.setItem('prevRoute', null);
                                 this.$router.push({name: "yourTasks"});
                                 this.$store.dispatch('showMessage', { message: res.data.message });
                                 this.overlaySave = false
@@ -946,6 +950,7 @@
                             }
                         })
                         .catch((err) => {
+                            console.log(err);
                             this.loading = false;
                             this.$store.dispatch('showMessage', { message: err.response.data.message, success: false });
                         })
