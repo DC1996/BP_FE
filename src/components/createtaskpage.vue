@@ -1139,7 +1139,7 @@
                         for(let option of answer.incorrect) {
                             if(option.trim() == '') {
                                 this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has an empty incorrect definition`, success: false});
-                                answer.hasErrors = true;
+                                answer.hasError = true;
                                 hasErrors = true;
                             }
                         }

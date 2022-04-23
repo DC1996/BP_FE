@@ -30,7 +30,7 @@ export class Answer {
     this.range = new Range();
 
     this.visible = true;
-    this.hasError = false;
+    this.hasErrors = false;
   }
 }
 
