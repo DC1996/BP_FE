@@ -406,8 +406,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn class="no-uppercase" color="black" outlined text @click="overlaySave = false"> Cancel </v-btn>
-                    <v-btn class="no-uppercase" color="primary" @click="saveText()"> Save </v-btn>
+                    <v-btn class="no-uppercase" :disabled="loading" color="black" outlined text @click="overlaySave = false"> Cancel </v-btn>
+                    <v-btn class="no-uppercase" :loading="loading" color="primary" @click="saveText()"> Save </v-btn>
                 </v-card-actions>
                 
             </v-card>
@@ -1127,7 +1127,7 @@
 
                     // Check if answer options are empty
                     if(answer.correct.length != 0) {
-                        for(let option of answer.incorrect) {
+                        for(let option of answer.correct) {
                             if(option.trim() == '') {
                                 this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has an empty correct definition`, success: false});
                                 answer.hasErrors = true;
