@@ -237,7 +237,6 @@
                 <!-- type == 'checkbox' -->
                 <div class="d-flex flex-row justify-space-between mb-1" v-if="task.renderOption == 'checkbox'"> 
                   <div class="d-flex flex-column py-1 px-2" v-for="(answer, index) in question.answers" :key="index">
-                    <p> {{ answer.name }} </p>
                       <v-checkbox dense class="pa-0 ma-0" 
                         v-for="(value, i) in answer.options"
                         :key="value.toString()" :label="value.toString()" :value="i">

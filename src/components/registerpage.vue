@@ -71,7 +71,7 @@
                         <v-col cols="12" v-if="userType == 0">
                             <p v-if="userType == 0" class="ma-0 pl-1 text-left font-weight-medium align-self-start">Grade</p>
                             <v-select v-if="userType == 0"
-                                :items="grades" :rules="rules['required']"
+                                :items="grades" v-model="grade" :rules="rules['required']"
                                 solo dense placeholder="Select grade">
                             </v-select>
                         </v-col>
