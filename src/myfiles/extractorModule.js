@@ -41,6 +41,7 @@ export class Extractor {
       let variable = this.task.variables.find(
         (parsedVar) => parsedVar.name == variable_name
       );
+
       // Add all variables that aren't in the list already
       if (!variable) {
         variable = new Variable(variable_name);
@@ -54,6 +55,8 @@ export class Extractor {
 
   // Save parsed answers
   addUniqueAnswers(tokens) {
+    console.log("Vars: ", this.task.variables);
+
     tokens.forEach((token) => {
       let answer_name = token.value;
 
@@ -208,8 +211,6 @@ export class Extractor {
     });
 
     text = text.concat("\n\n");
-
-    console.log(text); // logging
 
     return text;
   }

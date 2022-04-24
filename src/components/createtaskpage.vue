@@ -56,13 +56,15 @@
                             v-if="ext_text.task.answers.length == 0" >
                             No Answers found. Add Answers to questions.
                         </p>
-                        <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="mx-2 my-1 pa-0">
-                            <v-badge v-if="variable.visible" :value="answer.hasErrors && answer.visible" color="error" icon="mdi-exclamation" overlap>
+                        <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="ma-0 pa-0">
+                            <div class="mx-2 my-1" v-if="variable.visible">
+                            <v-badge :value="answer.hasErrors && answer.visible" color="error" icon="mdi-exclamation" overlap>
                                 <v-chip v-if="answer.visible" @click="answerInfo(i)"
                                     color="primary" label class="px-6 py-4 pointer">
                                     {{ answer.name.substr(1) }}
                                 </v-chip>
                             </v-badge>
+                            </div>
                         </div>
                     </div>
             </div>
@@ -232,7 +234,7 @@
                 <v-form ref="vForm" v-model="variableOk">
                 
                 <div v-if="variable.added" class="ma-2 mt-3 d-flex justify-space-between">
-                    <v-text-field :rules="[v => (v.trim().length != 0) || 'Name must have atleast 1 character', v => (/^[0-9a-zA-Z_]+$/.test(v)) || 'Name must contain only letters, numbers and underscores']" outlined label="Name" dense v-model="variable.name"></v-text-field>
+                    <v-text-field :rules="variableRules" outlined label="Name" dense v-model="variable.name"></v-text-field>
                     <v-btn plain icon @click="overlayV = false" class="ml-2 pa-0 shrink">
                         <v-icon color="danger">mdi-close</v-icon>
                     </v-btn>
@@ -713,6 +715,11 @@
                 rangeRules: [
                     v => /^[0-9.]*$/.test(v) || "Numbers only"
                 ],
+                variableRules: [
+                    v => (v.trim().length != 0) || 'Name must have atleast 1 character', 
+                    v => (/^[0-9a-zA-Z_]+$/.test(v)) || 'Name must contain only letters, numbers and underscores',
+                    v => this.ext_text.task.variables.filter((_, index) => this.indexV !== index).find( variable => variable.name == '$'.concat(v)) == undefined || 'Variable name already exists'
+                ],
 
                 selectedPreviewRenderOption: 'radio',
                 previewRenderOptions: ['text', 'select', 'radio', 'checkbox'],
@@ -1016,10 +1023,6 @@
 
                 this.createNewTask();
             },
-            restoreText: function() {
-                // TODO ?
-            },
-
 
             // Variables
             addVariable: function() {
