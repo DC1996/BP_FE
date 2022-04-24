@@ -30,7 +30,7 @@
                 <div class="d-flex flex-row flex-wrap align-center ma-0 pa-0 minus">
                     <div v-for="(variable, ind) in ext_text.task.variables" :key="ind + 'v'" class="ma-0 pa-0">
                         <div class="mx-2 my-1">
-                            <v-badge :value="variable.hasErrors" color="error" icon="mdi-exclamation" overlap>
+                            <v-badge :value="variable.hasErrors && variable.visible" color="error" icon="mdi-exclamation" overlap>
                                 <v-chip v-if="variable.visible" @click="variableInfo(ind)"
                                     color="primary" label class="px-6 py-4 pointer elevation-1">
                                     {{ variable.name.substr(1) }}
@@ -57,7 +57,7 @@
                             No Answers found. Add Answers to questions.
                         </p>
                         <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="mx-2 my-1 pa-0">
-                            <v-badge :value="answer.hasErrors" color="error" icon="mdi-exclamation" overlap>
+                            <v-badge :value="answer.hasErrors && answer.visible" color="error" icon="mdi-exclamation" overlap>
                                 <v-chip v-if="answer.visible" @click="answerInfo(i)"
                                     color="primary" label class="px-6 py-4 pointer">
                                     {{ answer.name.substr(1) }}
