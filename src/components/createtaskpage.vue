@@ -29,7 +29,7 @@
             <h3 class="ml-2 mb-1"> Variables </h3>          
                 <div class="d-flex flex-row flex-wrap align-center ma-0 pa-0 minus">
                     <div v-for="(variable, ind) in ext_text.task.variables" :key="ind + 'v'" class="ma-0 pa-0">
-                        <div class="mx-2 my-1">
+                        <div class="mx-2 my-1" v-if="variable.visible">
                             <v-badge :value="variable.hasErrors && variable.visible" color="error" icon="mdi-exclamation" overlap>
                                 <v-chip v-if="variable.visible" @click="variableInfo(ind)"
                                     color="primary" label class="px-6 py-4 pointer elevation-1">
@@ -57,7 +57,7 @@
                             No Answers found. Add Answers to questions.
                         </p>
                         <div v-for="(answer, i) in ext_text.task.answers" :key="i + 'a'" class="mx-2 my-1 pa-0">
-                            <v-badge :value="answer.hasErrors && answer.visible" color="error" icon="mdi-exclamation" overlap>
+                            <v-badge v-if="variable.visible" :value="answer.hasErrors && answer.visible" color="error" icon="mdi-exclamation" overlap>
                                 <v-chip v-if="answer.visible" @click="answerInfo(i)"
                                     color="primary" label class="px-6 py-4 pointer">
                                     {{ answer.name.substr(1) }}
@@ -1099,6 +1099,10 @@
                 for(let variable of this.variables) {
                     // Optimistically set error status to false
                     variable.hasErrors = false;
+
+                    // Skip not visible variables
+                    if( variable.visible == false) continue;
+
                     if(
                         variable.definition == '' && 
                         variable.range.start == '' && 
@@ -1123,6 +1127,9 @@
                 // Check for errors in answers
                 for(let answer of this.answers) {
                     answer.hasErrors = false;
+
+                    // Skip not visible answers
+                    if(answer.visible == false) continue;
 
                     if(answer.correct.length == 0) {
                         this.$store.dispatch('showMessage', {message: `Answer ${answer.name} has no correct option`, success: false});
