@@ -83,18 +83,6 @@
                     </v-btn>
                     </h4>
 
-                    <!-- <h3 class="ma-2 pa-1"> {{ preview.text.trim() }} </h3>
-                    <div id="latex-task" class="d-flex flex-column ma-2 pa-1" v-for="(q, i) in preview.questions" :key="'q' + i">
-                        
-                        <h4 class="ma-1"> {{ replaceAnswers(q.text.trim()) }} </h4>
-
-                        <div id="latex-task" class="ma-1 pa-1" v-for="(a, i) in q.answers" :key="'a' + i">
-                            <p v-for="(item, index) in a.options" :key="'ia' + index"> 
-                                {{ String.fromCharCode(98 + index) + ')'}} {{item}}
-                            </p>
-                        </div>
-                    </div> -->
-
                     <!-- Cards with task details, render options preview -->
                     <v-card class="my-2 mx-1 px-3">
                         <!-- Task name -->
@@ -131,7 +119,10 @@
                                 <div v-for="(answer, index) in question.answers" :key="index"
                                     class="d-flex flex-column py-4">
                                     <v-select style="max-width: 200px"
-                                        dense :items="answer.options" 
+                                        v-model="answer.selected"
+                                        :color="preview.expectedAnswers.find(({name}) => name == answer.name).value == answer.selected ? 'primary' : 'error'"
+                                        dense :items="answer.options"
+                                        :rules="[v => preview.expectedAnswers.find(({name}) => name == answer.name).value == answer.selected || '' ]"
                                         label="Answer" outlined>
                                     </v-select>
                                 </div>
@@ -1004,6 +995,10 @@
                 GeneratorService
                     .generate( { content: this.ext_text.task } )
                     .then((res) => {
+
+                        console.log("GENERATED: ", res);
+
+
                         this.preview = res.data.content;
                         this.message = res.data.message;
                         this.$store.dispatch('showMessage', {message: this.message});
