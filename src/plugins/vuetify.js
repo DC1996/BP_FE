@@ -1,3 +1,13 @@
+/*
+ * File: vuetify.js
+ * Description: Vuetify config file
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 import Vue from "vue";
 import Vuetify from "vuetify/lib/framework";
 

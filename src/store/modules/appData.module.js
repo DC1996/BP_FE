@@ -1,3 +1,13 @@
+/*****************************************************************
+ * File: appData.module.js
+ * Description: Stores the state of data related to user login
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 export default {
   // Shared variables across application
   state: {

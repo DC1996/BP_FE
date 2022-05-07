@@ -1,3 +1,13 @@
+<!-- 
+ * File: globalSnackbar.vue
+ * Description: Implements a global snackbar using Vuex
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
+
 <template>
   <v-snackbar 
     transition="slide-y-transition"

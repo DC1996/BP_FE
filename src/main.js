@@ -1,17 +1,29 @@
+/*****************************************************************
+ * File: main.js
+ * Description: Main Vue.js file, contains configuration, compo-
+ * nent imports and many other core functionality
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 import Vue from "vue";
 import App from "./App.vue";
 import VueRouter from "vue-router";
 import Navbar from "./components/Navbar.vue";
 import homepageVue from "./components/pages/homepage.vue";
-import yourtasksVue from "./components/yourtasks.vue";
-import yourtestsVue from "./components/yourtests.vue";
-import createtaskpageVue from "./components/createtaskpage.vue";
-import createTestPageVue from "./components/createTestPage.vue";
+import yourtasksVue from "./components/pages/yourtasks.vue";
+import yourtestsVue from "./components/pages/yourtests.vue";
+import createtaskpageVue from "./components/pages/createtaskpage.vue";
+import createTestPageVue from "./components/pages/createTestPage.vue";
 import loginpageVue from "./components/pages/loginpage.vue";
-import registerpageVue from "./components/registerpage.vue";
-
+import registerpageVue from "./components/pages/registerpage.vue";
+import yourAssignmentsVue from "./components/pages/yourAssignments.vue";
+import takeTestPageVue from "./components/pages/takeTestPage.vue";
+import userDataService from "./services/userDataService";
 import globalSnackbar from "./components/globalSnackbar.vue";
-
 import store from "./store";
 
 // Vuetify UI Components library
@@ -21,10 +33,6 @@ import "vuetify/dist/vuetify.min.css";
 
 // MathJax
 import MathJax, { initMathJax, renderByMathjax } from "mathjax-vue";
-import modifyTestPageVue from "./components/modifyTestPage.vue";
-import yourAssignmentsVue from "./components/yourAssignments.vue";
-import takeTestPageVue from "./components/takeTestPage.vue";
-import userDataService from "./services/userDataService";
 initMathJax({}, () => {
   renderByMathjax(document.getElementById("latexMath"));
 });
@@ -47,7 +55,6 @@ Vue.use(registerpageVue);
 Vue.use(viewStudentsResultsVue);
 Vue.use(createtaskpageVue);
 Vue.use(createTestPageVue);
-Vue.use(modifyTestPageVue);
 Vue.use(homepageVue);
 Vue.use(yourtasksVue);
 Vue.use(yourtestsVue);
@@ -110,15 +117,15 @@ const router = new VueRouter({
       name: "yourAssignments",
       component: yourAssignmentsVue,
     },
-
-    {
-      path: "/modifyTest/:id",
-      name: "modifyTest",
-      component: modifyTestPageVue,
-    },
   ],
 });
 
+/**
+ * Authorize user based on token and user type
+ *
+ * @param {*} type
+ * @returns
+ */
 async function authorizeUserType(type) {
   if (!localStorage.getItem("token")) {
     return false;
@@ -141,6 +148,9 @@ async function authorizeUserType(type) {
   }
 }
 
+/**
+ * This function runs before each router change
+ */
 router.beforeEach(async (to, from, next) => {
   // Load save user type
   let userType = store.state.app.loginType;
@@ -198,6 +208,7 @@ router.beforeEach(async (to, from, next) => {
   }
 });
 
+// Go to login page when an error occures
 router.onError(async (to, from, next) => {
   return next({ name: "login" });
 });

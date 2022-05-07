@@ -1,3 +1,13 @@
+<!-- 
+ * File: Navbar.vue
+ * Description: Implements the navigation bar and functions
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
+
 <template>
   <v-app-bar id="navbar" app elevate-on-scroll hide-on-scroll fade-on-scroll light height='80px' color="white" rounded class="px-8 elevation-2">
       

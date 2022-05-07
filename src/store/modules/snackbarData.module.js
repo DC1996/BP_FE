@@ -1,3 +1,13 @@
+/*****************************************************************
+ * File: snackbarData.module.js
+ * Description: Stores configuration about the global snackbar in globalSnackbar.vue
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 export default {
   // Data
   state: {

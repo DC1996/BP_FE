@@ -1,3 +1,13 @@
+<!-- 
+ * File: App.vue
+ * Description: Contains the main layout and setup for the application
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
+
 <template>
   <v-app class="custom-font">
 
@@ -5,7 +15,7 @@
     <globalSnackbarVue></globalSnackbarVue>
 
     <!-- NAVBAR -->
-    <NavbarVue/>
+    <Navbar/>
 
     <!-- CONTENT -->
     <v-main class="ma-2">
@@ -16,14 +26,14 @@
 </template>
 
 <script>
-  import NavbarVue from "./components/Navbar.vue";
+  import Navbar from "./components/Navbar.vue";
   import globalSnackbarVue from "./components/globalSnackbar.vue";
 
   export default {
     name: 'App',
 
     components: {
-      NavbarVue,
+      Navbar,
       globalSnackbarVue
     },
 

@@ -1,1 +1,0 @@
-#text Calculate the following.\n\n#question $x1 + $x2 = @r \n\n#definitions\n$x1\n$x2\n\n@r.correct = [\n$x1 + $x2\n]\n@r.incorrect = [\n$x1 + $x2 + 1,\n$x1 + $x2 - 1,\n$x1 - $x2n\n]\n\n#ranges\n$x1 = range(0, 100, 1)\n$x2 = range(0, 100, 1)

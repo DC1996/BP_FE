@@ -1,3 +1,13 @@
+/*****************************************************************
+ * File: concreteTestDataService.js
+ * Description: Implements functions for comunicating with API about ConcreteTest
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 import http from "../../axios.config";
 
 class ConcreteTestDataService {

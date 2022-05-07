@@ -1,3 +1,12 @@
+<!-- 
+ * File: viewStudentResults.vue
+ * Description: Implements view students results page and functions
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
 <template>
     <v-container 
         class="d-flex flex-column justify-start align-center mt-5 rounded-lg">

@@ -1,3 +1,13 @@
+<!-- 
+ * File: homepage.vue
+ * Description: Implements home page and functions
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
+
 <template>
     <v-container class="d-flex flex-row justify-center align-center mt-4">
 

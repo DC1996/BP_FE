@@ -1,3 +1,15 @@
+/*****************************************************************
+ * File: testData.module.js
+ * Description: Stores data about current configuration when
+ * creating a new Test of modifying an existing one
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
+// imports
 import categoryDataService from "../../services/categoryDataService";
 import generatorService from "../../services/generatorService";
 import taskDataService from "../../services/taskDataService";
@@ -242,6 +254,8 @@ export default {
               foundInArray.content = concreteTask.content;
             }
           }
+
+          console.log("CONCRETE TASKS GOT BACK: ", response.data.concreteTasks);
 
           let payload = { concreteTasks: response.data.concreteTasks };
           context.commit("SET_CONCRETE_TASKS", payload);

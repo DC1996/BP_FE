@@ -1,3 +1,14 @@
+/*****************************************************************
+ * File: index.js
+ * Description: Aggregates the other Store modules and 
+ * provides basic configuration of Vuex store
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ */
+
 import Vue from "vue";
 import Vuex from "vuex";
 

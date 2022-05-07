@@ -1,3 +1,12 @@
+<!-- 
+ * File: loginpage.vue
+ * Description: Implements lgin page and functions
+ *
+ * Project: Bachelor's Thesis - Web system for Math tests creation
+ * Author: xcziro00, David Czirok
+ *
+ * Last modified: 07-05-2022
+ -->
 <template>
     <v-overlay :light='true' :dark='false' color="white" opacity="1">
         <v-container class="d-flex flex-column align-center">
