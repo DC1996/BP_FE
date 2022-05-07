@@ -667,7 +667,7 @@
     import { parseMathLang, Question, ConcreteTask, Variable, Answer } from "../../languageHandlers/taskHandler"
     import { Extractor } from "../../languageHandlers/extractorModule";
 
-    // import MathJax, { initMathJax, renderByMathjax } from "mathjax-vue";
+    import MathJax, { initMathJax, renderByMathjax } from "mathjax-vue";
     import { cloneDeep, debounce } from 'lodash';
 
     import TaskDataService from "../../services/taskDataService";
