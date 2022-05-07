@@ -7,11 +7,12 @@
  * Last modified: 07-05-2022
  */
 
-const app = express();
+
 const path = require("path");
 const express = require("express");
 const serveStatic = require("serve-static");
 
+const app = express();
 app.use(serveStatic(path.join(__dirname, "dist")));
 
 // Set port, listen for requests
