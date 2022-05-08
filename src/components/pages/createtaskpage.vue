@@ -717,11 +717,11 @@
                 ],
                 startRules: [
                     v => /^[0-9.-]*$/.test(v) || "Numbers only",
-                    v => v < this.variable.range.end || "Range mismatch"
+                    v => parseInt(v) < parseInt(this.variable.range.end) || "Range mismatch"
                 ],
                 endRules: [
                     v => /^[0-9.-]*$/.test(v) || "Numbers only",
-                    v => v > this.variable.range.start || "Range mismatch"
+                    v => parseInt(v) > parseInt(this.variable.range.start) || "Range mismatch"
                 ],
                 rangeRules: [
                     v => /^[0-9.-]*$/.test(v) || "Numbers only"
