@@ -11,7 +11,7 @@ import axios from "axios";
 
 export default axios.create({
   baseURL: "https://xcziro00-bp-server.herokuapp.com/api", // production build
-  /* baseURL: "http://localhost:8080/" + "api/", */ // local development 
+  /* baseURL: "http://localhost:8080/" + "api/", */        // LOCAL TESTING
   headers: {
     "Content-type": "application/json",
   },

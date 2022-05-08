@@ -260,12 +260,12 @@
                 <p class="ma-2 mt-0"> Range {{ variable.range.fullRange() }} </p>
                 <v-row class="d-flex flex-row flex-nowrap px-3">
                     <v-text-field 
-                        :rules="rangeRules"
+                        :rules="startRules"
                         label="Start" v-model="variable.range.start" 
                         outlined dense class="shrink mx-2 mt-3">
                     </v-text-field>
                     <v-text-field
-                        :rules="rangeRules"
+                        :rules="endRules"
                         label="End" v-model="variable.range.end" 
                         outlined dense class="shrink mx-2 mt-3">
                     </v-text-field>
@@ -715,8 +715,16 @@
                     v => v.length != 0 || "Question cannot be empty",
                     v => /^.*@[a-zA-Z0-9]+.*$/.test(v) || "Question must contain an Answer"
                 ],
+                startRules: [
+                    v => /^[0-9.\-]*$/.test(v) || "Numbers only",
+                    v => v < this.variable.range.end || "Range mismatch"
+                ],
+                endRules: [
+                    v => /^[0-9.\-]*$/.test(v) || "Numbers only",
+                    v => v > this.variable.range.start || "Range mismatch"
+                ],
                 rangeRules: [
-                    v => /^[0-9.]*$/.test(v) || "Numbers only"
+                    v => /^[0-9.\-]*$/.test(v) || "Numbers only"
                 ],
                 variableRules: [
                     v => (v.trim().length != 0) || 'Name must have atleast 1 character', 

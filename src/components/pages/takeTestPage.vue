@@ -104,7 +104,7 @@
           <v-skeleton-loader type="text" v-if="loading"></v-skeleton-loader>
           <v-row class="d-flex justify-end align-center pa-2 px-7 mt-2" v-if="!loading" >
             <v-btn outlined class="my-2 mb-4 mx-2 align-self-end no-uppercase" text @click="$router.push({name: 'yourAssignments'})"> Back </v-btn>
-            <v-btn outlined color="primary" class="my-2 mb-4 mx-2 align-self-end no-uppercase" @click="saveAnswers()"> Save answers </v-btn>
+             <!-- <v-btn outlined color="primary" class="my-2 mb-4 mx-2 align-self-end no-uppercase" @click="saveAnswers()"> Save answers </v-btn> -->
             <v-btn class="my-2 mb-4 mx-2 align-self-end no-uppercase" color="primary" @click="finishTest()"> Finish test </v-btn>
           </v-row>
         </v-container>
