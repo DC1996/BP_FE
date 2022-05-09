@@ -98,22 +98,24 @@ Vue.mixin({
 const router = new VueRouter({
   // Define web app routes
   routes: [
-    { path: "/", name: "home", component: homepageVue },
-    { path: "/login", name: "login", component: loginpageVue },
-    { path: "/register", name: "register", component: registerpageVue },
-    { path: "/yourTasks", name: "yourTasks", component: yourtasksVue },
-    { path: "/yourTests", name: "yourTests", component: yourtestsVue },
-    { path: "/createTask", name: "createTask", component: createtaskpageVue },
-    { path: "/createTest", name: "createTest", component: createTestPageVue },
-    { path: "/takeTest/:id", name: "takeTest", component: takeTestPageVue },
+    { path: "/", meta: { title: 'Math - BP (xcziro00)'}, name: "home", component: homepageVue },
+    { path: "/login", meta: { title: 'Math - BP (xcziro00)'}, name: "login", component: loginpageVue },
+    { path: "/register", meta: { title: 'Math - BP (xcziro00)'}, name: "register", component: registerpageVue },
+    { path: "/yourTasks", meta: { title: 'Math - BP (xcziro00)'}, name: "yourTasks", component: yourtasksVue },
+    { path: "/yourTests", meta: { title: 'Math - BP (xcziro00)'}, name: "yourTests", component: yourtestsVue },
+    { path: "/createTask", meta: { title: 'Math - BP (xcziro00)'}, name: "createTask", component: createtaskpageVue },
+    { path: "/createTest", meta: { title: 'Math - BP (xcziro00)'}, name: "createTest", component: createTestPageVue },
+    { path: "/takeTest/:id", meta: { title: 'Math - BP (xcziro00)'}, name: "takeTest", component: takeTestPageVue },
     {
       path: "/viewStudentResults/:id",
+      meta: { title: 'Math - BP (xcziro00)'}, 
       name: "viewStudentResults",
       component: viewStudentsResultsVue,
     },
 
     {
       path: "/yourAssignments",
+      meta: { title: 'Math - BP (xcziro00)'}, 
       name: "yourAssignments",
       component: yourAssignmentsVue,
     },

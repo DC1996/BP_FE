@@ -716,15 +716,15 @@
                     v => /^.*@[a-zA-Z0-9]+.*$/.test(v) || "Question must contain an Answer"
                 ],
                 startRules: [
+                    v => parseInt(v) < parseInt(this.variable.range.end) || "Range mismatch",
                     v => /^[0-9.-]*$/.test(v) || "Numbers only",
-                    v => parseInt(v) < parseInt(this.variable.range.end) || "Range mismatch"
                 ],
                 endRules: [
+                    v => parseInt(v) > parseInt(this.variable.range.start) || "Range mismatch",
                     v => /^[0-9.-]*$/.test(v) || "Numbers only",
-                    v => parseInt(v) > parseInt(this.variable.range.start) || "Range mismatch"
                 ],
                 rangeRules: [
-                    v => /^[0-9.-]*$/.test(v) || "Numbers only"
+                    v => /^[0-9.]*$/.test(v) || "Numbers only"
                 ],
                 variableRules: [
                     v => (v.trim().length != 0) || 'Name must have atleast 1 character', 
