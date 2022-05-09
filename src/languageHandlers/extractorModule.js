@@ -1,6 +1,7 @@
 /*
  * File: extractorModule.js
- * Description: Extracts the information from the user input and generates a way to re
+ * Description: Extracts the information from the user input and generates
+ * task template in my prosposed language
  *
  * Project: Bachelor's Thesis - Web system for Math tests creation
  * Author: xcziro00, David Czirok

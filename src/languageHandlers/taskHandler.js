@@ -1,6 +1,6 @@
 /*
  * File: taskHandler.js
- * Description: Interprets the proposed language 
+ * Description: Interprets my proposed language 
  *
  * Project: Bachelor's Thesis - Web system for Math tests creation
  * Author: xcziro00, David Czirok

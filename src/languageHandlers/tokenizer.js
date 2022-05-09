@@ -1,7 +1,7 @@
 /*
  * File: tokenizer.js
  * Description: Implements Token class and tokenize
- * function that performs a lexical analysis of the given language
+ * function that performs a lexical analysis of my proposed language
  *
  * Project: Bachelor's Thesis - Web system for Math tests creation
  * Author: xcziro00, David Czirok
